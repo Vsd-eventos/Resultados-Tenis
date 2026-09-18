@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VSD Eventos - Torneo de Tenis</title>
+    <title>VSD Eventos - Torneo de Voley</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -107,7 +107,6 @@
             text-transform: uppercase;
         }
  
-        /* Se quitó "outline: none" (dejaba el select sin foco visible para teclado) */
         .select-categoria:focus-visible,
         .btn-dia:focus-visible {
             outline: 3px solid var(--color-blanco);
@@ -176,15 +175,13 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-        }
- 
-        /* Color de acento según la categoría: rojo por defecto, rosa = mujeres, azul = varones */
-        .match-card {
             --acento: var(--color-rojo);
         }
+
         .match-card.mujeres {
             --acento: #c2255c;
         }
+
         .match-card.varones {
             --acento: #1971c2;
         }
@@ -229,16 +226,17 @@
             border-radius: 6px;
         }
  
-        /* Nombres largos ya no empujan los casilleros de sets fuera de la tarjeta */
         .player-name {
             font-weight: 600;
             font-size: 1rem;
             color: var(--color-negro);
             min-width: 0;
             overflow-wrap: anywhere;
+            display: flex;
+            align-items: center;
         }
  
-        /* Fila del ganador: verde, distinto del rosa/azul de las categorías */
+        /* Fila del ganador */
         .player-row.ganador {
             background-color: #e6f6ec;
             box-shadow: inset 0 0 0 2px #2b8a3e;
@@ -301,7 +299,7 @@
                 <span class="vsd-text">VSD</span>
                 <span class="eventos-text">eventos</span>
             </div>
-            <h1>Torneo de <span class="rojo">Tenis</span></h1>
+            <h1>Torneo de <span class="rojo">Voley</span></h1>
         </div>
  
         <select id="select-categoria" class="select-categoria" aria-label="Filtrar por categoría" onchange="filtrarPorCategoria(this.value)">
@@ -330,25 +328,20 @@
     <script>
         const SPREADSHEET_ID = '1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U';
  
-        // Cantidad de filas de encabezado que tiene la planilla (poné 0 si no tiene títulos)
         const FILAS_ENCABEZADO = 1;
         const INTERVALO_ACTUALIZACION = 15000;
-        const TOTAL_COLUMNAS = 10; // Fecha, Categoría, J1, J2, 3 sets J1, 3 sets J2
- 
-        // Sets que hay que ganar para que se marque un ganador (mejor de 3 = 2).
-        // Poné 1 si en alguna categoría se juega a un solo set.
+        const TOTAL_COLUMNAS = 10;
         const SETS_PARA_GANAR = 2;
         const DIAS_SEMANA = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
  
-        let filas = [];          // [{ celdas: [...], fechaRaw }]
-        let firmaDatos = '';     // para no redibujar si no cambió nada
+        let filas = [];
+        let firmaDatos = '';
         let cargando = false;
         let diaSeleccionado = 'TODOS';
         let categoriaSeleccionada = 'TODAS';
  
         /* ---------- Utilidades ---------- */
  
-        // Mayúsculas, sin tildes y sin espacios sobrantes: "Sábado" -> "SABADO"
         function normalizar(texto) {
             return String(texto ?? '')
                 .normalize('NFD')
@@ -357,12 +350,6 @@
                 .trim();
         }
  
-        // "Sub-12", "SUB 12", "sub12" -> "SUB12"
-        function claveCategoria(texto) {
-            return normalizar(texto).replace(/[\s\-_.]/g, '');
-        }
- 
-        // Evita que el contenido de la planilla rompa o inyecte HTML
         function escapeHTML(valor) {
             return String(valor ?? '').replace(/[&<>"']/g, c => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -372,19 +359,15 @@
         /* ---------- Carga de datos ---------- */
  
         async function cargarDatos() {
-            if (cargando) return; // evita pedidos superpuestos
+            if (cargando) return;
             cargando = true;
  
             try {
-                // "_" evita respuestas viejas en caché; "headers" fija cuántas filas son títulos
                 const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=${FILAS_ENCABEZADO}&_=${Date.now()}`;
                 const response = await fetch(url, { cache: 'no-store' });
                 if (!response.ok) throw new Error('Error al acceder a la planilla');
  
                 const text = await response.text();
- 
-                // La respuesta viene envuelta en google.visualization.Query.setResponse({...});
-                // Se extrae el JSON completo sin usar lookbehind (rompe Safari/iOS viejos)
                 const inicio = text.indexOf('{');
                 const fin = text.lastIndexOf('}');
                 if (inicio === -1 || fin === -1) throw new Error('Formato de datos no válido');
@@ -398,23 +381,20 @@
                     const celdas = [];
                     for (let i = 0; i < TOTAL_COLUMNAS; i++) {
                         const cell = c[i];
-                        // 'f' = texto formateado, 'v' = valor crudo
                         celdas.push(!cell ? '' : (cell.f ?? cell.v ?? ''));
                     }
-                    // Valor crudo de la fecha (ej: "Date(2026,8,18)"), más fiable que el texto formateado
                     const fechaRaw = c[0] ? (c[0].v ?? c[0].f ?? '') : '';
                     return { celdas, fechaRaw };
                 });
  
                 const firma = JSON.stringify(nuevasFilas);
-                if (firma === firmaDatos) return; // sin cambios: no se redibuja
+                if (firma === firmaDatos) return;
  
                 firmaDatos = firma;
                 filas = nuevasFilas;
                 actualizarListaPartidos();
             } catch (error) {
                 console.error('Error al cargar datos:', error);
-                // Si ya había partidos en pantalla, se mantienen (un corte de red no borra todo)
                 if (filas.length === 0) {
                     document.getElementById('matchesContainer').innerHTML = `
                         <p class="loading error">
@@ -433,22 +413,19 @@
         function obtenerDia(fila) {
             const texto = normalizar(fila.celdas[0]);
  
-            // 1) La celda ya dice el día ("Viernes", "SÁBADO 19/09", ...)
             for (const dia of ['VIERNES', 'SABADO', 'DOMINGO']) {
                 if (texto.includes(dia)) return dia;
             }
  
-            // 2) Es una fecha: se arma con año/mes/día a mano para evitar
-            //    errores de zona horaria y de formato día/mes vs mes/día
-            let anio, mes, dia; // mes base 0
+            let anio, mes, dia;
             let r;
  
             if ((r = String(fila.fechaRaw).match(/Date\((\d+),\s*(\d+),\s*(\d+)/))) {
-                anio = +r[1]; mes = +r[2]; dia = +r[3];          // gviz ya trae el mes base 0
+                anio = +r[1]; mes = +r[2]; dia = +r[3];
             } else if ((r = texto.match(/(\d{4})-(\d{2})-(\d{2})/))) {
-                anio = +r[1]; mes = +r[2] - 1; dia = +r[3];      // 2026-09-18
+                anio = +r[1]; mes = +r[2] - 1; dia = +r[3];
             } else if ((r = texto.match(/(?:^|\D)(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4}|\d{2})(?!\d)/))) {
-                dia = +r[1]; mes = +r[2] - 1; anio = +r[3];      // 18/09/2026
+                dia = +r[1]; mes = +r[2] - 1; anio = +r[3];
                 if (anio < 100) anio += 2000;
             } else {
                 return '';
@@ -458,10 +435,8 @@
             return isNaN(fecha.getTime()) ? '' : DIAS_SEMANA[fecha.getDay()];
         }
  
-        /* ---------- Dibujo de tarjetas ---------- */
- 
-        // Detecta si la categoría es de mujeres o varones según lo que diga el texto
-        // ("Sub 12 Mujeres", "SUB 14 Femenino", "Sub 16 Varones", "Sub 18 M", etc.)
+        /* ---------- Género y Ganador ---------- */
+
         function obtenerGenero(categoria) {
             const t = normalizar(categoria);
             if (/MUJER|FEM|DAMA|NENA|CHICA|GIRL|(?:^|[\s\-_\/])F(?:$|[\s\-_\/])/.test(t)) return 'mujeres';
@@ -474,8 +449,6 @@
             return Number.isNaN(n) ? null : n;
         }
  
-        // Compara set por set: en cada uno gana quien tiene más puntos.
-        // Devuelve 1 (gana jugador 1), 2 (gana jugador 2) o 0 (todavía sin ganador).
         function calcularGanador(celdas) {
             let setsJ1 = 0;
             let setsJ2 = 0;
@@ -483,7 +456,7 @@
             for (let i = 0; i < 3; i++) {
                 const p1 = numeroSet(celdas[4 + i]);
                 const p2 = numeroSet(celdas[7 + i]);
-                if (p1 === null || p2 === null || p1 === p2) continue; // set sin jugar o empatado
+                if (p1 === null || p2 === null || p1 === p2) continue;
                 if (p1 > p2) setsJ1++; else setsJ2++;
             }
  
@@ -497,23 +470,22 @@
             return `<span class="set-box">${escapeHTML(vacio ? '-' : valor)}</span>`;
         }
  
+        /* ---------- Dibujo de Tarjetas ---------- */
+
         function actualizarListaPartidos() {
             const container = document.getElementById('matchesContainer');
  
             const filtrados = filas.filter(fila => {
                 const [, categoria, j1, j2] = fila.celdas;
  
-                // Descarta filas vacías (antes aparecían como "Jugador 1 / Jugador 2")
                 if (!String(j1).trim() && !String(j2).trim()) return false;
  
-                // Filtro por día: solo mira la columna de fecha
-                // (antes buscaba en toda la fila y "Domingo" como nombre de jugador colaba partidos)
                 if (diaSeleccionado !== 'TODOS' && obtenerDia(fila) !== diaSeleccionado) return false;
  
-                // Filtro por categoría: solo mira la columna de categoría
-                if (categoriaSeleccionada !== 'TODAS' &&
-                    !claveCategoria(categoria).includes(claveCategoria(categoriaSeleccionada))) {
-                    return false;
+                if (categoriaSeleccionada !== 'TODAS') {
+                    const catNorm = normalizar(categoria);
+                    const selNorm = normalizar(categoriaSeleccionada);
+                    if (!catNorm.includes(selNorm)) return false;
                 }
  
                 return true;
@@ -531,22 +503,36 @@
                 const j1 = celdas[2] || 'Por definir';
                 const j2 = celdas[3] || 'Por definir';
  
+                const genero = obtenerGenero(categoria);
+                const ganador = calcularGanador(celdas);
+
+                let etiquetaGenero = '';
+                if (genero === 'mujeres') etiquetaGenero = '<span class="genero-tag">Femenino</span>';
+                if (genero === 'varones') etiquetaGenero = '<span class="genero-tag">Masculino</span>';
+
                 const card = document.createElement('div');
-                card.className = 'match-card';
+                card.className = `match-card ${genero}`;
                 card.innerHTML = `
                     <div class="match-header">
                         <span class="category-badge">${escapeHTML(categoria)}</span>
+                        ${etiquetaGenero}
                     </div>
  
-                    <div class="player-row">
-                        <span class="player-name">${escapeHTML(j1)}</span>
+                    <div class="player-row ${ganador === 1 ? 'ganador' : ''}">
+                        <span class="player-name">
+                            ${escapeHTML(j1)}
+                            ${ganador === 1 ? '<span class="ganador-tag">Ganador</span>' : ''}
+                        </span>
                         <div class="sets-container">
                             ${casillero(celdas[4])}${casillero(celdas[5])}${casillero(celdas[6])}
                         </div>
                     </div>
  
-                    <div class="player-row">
-                        <span class="player-name">${escapeHTML(j2)}</span>
+                    <div class="player-row ${ganador === 2 ? 'ganador' : ''}">
+                        <span class="player-name">
+                            ${escapeHTML(j2)}
+                            ${ganador === 2 ? '<span class="ganador-tag">Ganador</span>' : ''}
+                        </span>
                         <div class="sets-container">
                             ${casillero(celdas[7])}${casillero(celdas[8])}${casillero(celdas[9])}
                         </div>
@@ -560,8 +546,6 @@
  
         function filtrarPorDia(dia) {
             diaSeleccionado = dia;
-            // Se compara con data-dia (antes se comparaba el texto del botón:
-            // "SÁBADO" no coincidía con "SABADO" y el botón nunca se marcaba)
             document.querySelectorAll('.btn-dia').forEach(btn => {
                 btn.classList.toggle('activo', btn.dataset.dia === dia);
             });
@@ -578,4 +562,3 @@
     </script>
 </body>
 </html>
- 
