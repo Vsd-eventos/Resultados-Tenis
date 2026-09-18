@@ -258,7 +258,7 @@
         async function cargarDatos() {
             try {
                 // Endpoint nativo de lectura JSON de Google
-                const url = `https://docs.google.com/spreadsheets/d/1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U/edit?usp=sharing`;
+                const url = `https://docs.google.com/spreadsheets/d/1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U/edit?resourcekey=&gid=463646504#gid=463646504`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Error al acceder a la planilla');
 
