@@ -173,7 +173,7 @@
 
         #estado.oculto { display: none !important; }
 
-        /* --- ESTILOS DE LAS TARJETAS --- */
+        /* --- TARJETAS --- */
         .grid-partidos {
             display: flex;
             flex-direction: column;
@@ -186,25 +186,13 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             overflow: hidden;
             border: 1px solid var(--color-gris-linea);
-        }
-
-        .mini-card-header {
-            background-color: var(--color-negro);
-            color: var(--color-blanco);
-            padding: 6px 15px;
-            font-family: var(--fuente-principal);
-            font-size: 0.88rem;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            border-bottom: 3px solid var(--color-rojo);
-            letter-spacing: 0.5px;
+            border-top: 4px solid var(--color-rojo);
         }
 
         .mini-card-body {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
+            padding: 16px;
             gap: 15px;
         }
 
@@ -234,13 +222,13 @@
             gap: 6px;
         }
 
-        /* Cabecera superior de las columnas de Sets */
+        /* Cabeceras sobre los resultados de los Sets */
         .cabecera-sets-titulos {
             display: flex;
             justify-content: flex-end;
             align-items: center;
             gap: 6px;
-            padding-right: 4px;
+            padding-right: 2px;
         }
 
         .etiqueta-set-titulo {
@@ -248,13 +236,13 @@
             font-size: 0.78rem;
             font-weight: 700;
             color: #718096;
-            min-width: 32px;
+            min-width: 34px;
             text-align: center;
             text-transform: uppercase;
         }
 
         .etiqueta-set-titulo.total-titulo {
-            min-width: 38px;
+            min-width: 40px;
             color: var(--color-negro);
         }
 
@@ -298,11 +286,11 @@
             background-color: #edf2f7;
             color: #2d3748;
             font-family: var(--fuente-principal);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            padding: 2px 6px;
+            padding: 3px 6px;
             border-radius: 4px;
-            min-width: 32px;
+            min-width: 34px;
             text-align: center;
         }
 
@@ -311,7 +299,7 @@
             color: var(--color-blanco);
             font-size: 1.05rem;
             padding: 3px 8px;
-            min-width: 38px;
+            min-width: 40px;
         }
 
         .fila-jugador.ganador .badge-set.total {
@@ -410,7 +398,7 @@
         let categoriaSeleccionada = 'TODAS';
 
         function normalizarTexto(txt) {
-            if (!txt) return "";
+            if (txt === null || txt === undefined) return "";
             return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
@@ -438,7 +426,7 @@
                 }
                 document.getElementById('estado').classList.add('oculto');
             } catch (error) {
-                console.warn('Cargando datos...', error);
+                console.warn('Cargando con respaldo local', error);
                 document.getElementById('estado').classList.add('oculto');
             }
         }
@@ -476,15 +464,19 @@
             return null;
         }
 
+        /**
+         * PROCESAMIENTO DINÁMICO MEJORADO
+         * Detecta columnas de sets tanto si vienen como "SET 1", "SET 2"
+         * como si vienen con puntuación directa "25-18", "25-20" o puntuaciones separadas.
+         */
         function procesarFilaDinamica(fila) {
             const keys = Object.keys(fila);
 
             let j1Nombre = "Jugador 1";
             let j2Nombre = "Jugador 2";
             let categoria = "CATEGORÍA";
-            let fechaHora = "";
 
-            let setsDetectados = []; // Almacena { nombre: 'Set 1', p1: 25, p2: 18 }
+            let setsDetectados = [];
             let totalJ1 = null;
             let totalJ2 = null;
 
@@ -492,57 +484,62 @@
                 const kNorm = normalizarTexto(key);
                 const val = fila[key] !== undefined && fila[key] !== null ? String(fila[key]).trim() : "";
 
-                if (!val) return;
-
-                if (kNorm.includes("MARCA") || kNorm.includes("TEMPORAL") || kNorm.includes("FECHA") || kNorm.includes("DIA")) {
-                    fechaHora = val;
+                // Detección de Categoría
+                if (kNorm.includes("CATEGORIA")) {
+                    if (val) categoria = val;
                 }
-                else if (kNorm.includes("CATEGORIA")) {
-                    categoria = val;
-                }
+                // Detección de Jugadores
                 else if ((kNorm.includes("JUGADOR 1") || kNorm.includes("EQUIPO 1") || kNorm.includes("LOCAL") || kNorm.includes("CLUB 1")) && !kNorm.includes("SET") && !kNorm.includes("RESULTADO")) {
-                    j1Nombre = val;
+                    if (val) j1Nombre = val;
                 }
                 else if ((kNorm.includes("JUGADOR 2") || kNorm.includes("EQUIPO 2") || kNorm.includes("VISITANTE") || kNorm.includes("CLUB 2")) && !kNorm.includes("SET") && !kNorm.includes("RESULTADO")) {
-                    j2Nombre = val;
+                    if (val) j2Nombre = val;
                 }
-                else if ((kNorm.includes("SETS 1") || kNorm.includes("RESULTADO 1") || kNorm.includes("TOTAL 1")) && !kNorm.includes("PARCIAL")) {
-                    totalJ1 = parseInt(val, 10);
+                // Detección de Totales si existiera columna explícita
+                else if ((kNorm.includes("TOTAL 1") || kNorm.includes("SETS 1")) && !kNorm.includes("PARCIAL")) {
+                    if (val !== "") totalJ1 = parseInt(val, 10);
                 }
-                else if ((kNorm.includes("SETS 2") || kNorm.includes("RESULTADO 2") || kNorm.includes("TOTAL 2")) && !kNorm.includes("PARCIAL")) {
-                    totalJ2 = parseInt(val, 10);
+                else if ((kNorm.includes("TOTAL 2") || kNorm.includes("SETS 2")) && !kNorm.includes("PARCIAL")) {
+                    if (val !== "") totalJ2 = parseInt(val, 10);
                 }
+                // Detección de Sets (Puntos de cada set)
                 else if (kNorm.includes("SET")) {
-                    // Extraer los puntos del formato "25-18" o similar
-                    const match = val.match(/(\d+)\s*[\-\:]\s*(\d+)/);
-                    if (match) {
-                        setsDetectados.push({
-                            etiqueta: key.toUpperCase().replace(/CATEGORIA|RESULTADO|DE/g, '').trim(),
-                            p1: parseInt(match[1], 10),
-                            p2: parseInt(match[2], 10)
-                        });
+                    let p1 = 0, p2 = 0;
+                    let numSetMatch = kNorm.match(/\d+/);
+                    let numSet = numSetMatch ? numSetMatch[0] : (setsDetectados.length + 1);
+
+                    // Formato "25-18" o "25 - 18"
+                    const matchGion = val.match(/^(\d+)\s*[\-\:]\s*(\d+)$/);
+                    if (matchGion) {
+                        p1 = parseInt(matchGion[1], 10);
+                        p2 = parseInt(matchGion[2], 10);
+                        setsDetectados.push({ etiqueta: `SET ${numSet}`, p1, p2 });
+                    } else if (val !== "" && !isNaN(parseInt(val, 10))) {
+                        // Si el valor es solo un número de puntos de ese set
+                        setsDetectados.push({ etiqueta: `SET ${numSet}`, p1: parseInt(val, 10), p2: 0 });
                     }
                 }
             });
 
-            // Si no vinieron los sets ganados totales en columnas explícitas, los calculamos contando los sets ganados por cada jugador
-            if (totalJ1 === null || isNaN(totalJ1)) {
-                totalJ1 = 0;
-                totalJ2 = 0;
-                setsDetectados.forEach(set => {
-                    if (set.p1 > set.p2) totalJ1++;
-                    else if (set.p2 > set.p1) totalJ2++;
-                });
-            }
+            // Fallback: Si no vinieron los totales definidos en columnas dedicadas, calculamos los sets ganados por cada jugador
+            let setsGanadosJ1 = 0;
+            let setsGanadosJ2 = 0;
+
+            setsDetectados.forEach(s => {
+                if (s.p1 > s.p2) setsGanadosJ1++;
+                else if (s.p2 > s.p1) setsGanadosJ2++;
+            });
+
+            if (totalJ1 === null || isNaN(totalJ1)) totalJ1 = setsGanadosJ1;
+            if (totalJ2 === null || isNaN(totalJ2)) totalJ2 = setsGanadosJ2;
 
             return {
                 j1Nombre,
                 j2Nombre,
                 categoria,
-                fechaHora,
                 setsDetectados,
-                totalJ1: totalJ1 !== null && !isNaN(totalJ1) ? totalJ1 : 0,
-                totalJ2: totalJ2 !== null && !isNaN(totalJ2) ? totalJ2 : 0
+                totalJ1,
+                totalJ2
             };
         }
 
@@ -551,7 +548,7 @@
             if (!contenedor || todosLosDatos.length === 0) return;
 
             const keys = Object.keys(todosLosDatos[0]);
-            const keyMarcaTemporal = keys.find(k => normalizarTexto(k).includes("MARCA") || normalizarTexto(k).includes("TEMPORAL")) || keys[0];
+            const keyMarcaTemporal = keys.find(k => normalizarTexto(k).includes("MARCA") || normalizarTexto(k).includes("TEMPORAL") || normalizarTexto(k).includes("FECHA")) || keys[0];
             const keyCategoria = keys.find(k => normalizarTexto(k).includes("CATEGORIA"));
 
             const diaBusqueda = normalizarTexto(diaSeleccionado);
@@ -584,7 +581,7 @@
             });
 
             if (datosFiltrados.length === 0) {
-                contenedor.innerHTML = `<div class="sin-resultados">No hay registros cargados para los filtros seleccionados.</div>`;
+                contenedor.innerHTML = `<div class="sin-resultados">No hay registros para mostrar con los filtros seleccionados.</div>`;
                 return;
             }
 
@@ -593,36 +590,42 @@
             datosFiltrados.forEach(fila => {
                 const p = procesarFilaDinamica(fila);
 
-                // Determinar dinámicamente el ganador según la cantidad total de sets ganados
+                // Determinar quién tiene más sets ganados
                 const j1Gana = p.totalJ1 > p.totalJ2;
                 const j2Gana = p.totalJ2 > p.totalJ1;
 
-                // Crear los encabezados superiores de cada Set dinámicamente
-                let htmlCabeceraSets = p.setsDetectados.map(s => `<span class="etiqueta-set-titulo">${s.etiqueta}</span>`).join('');
+                // Generar cabeceras superiores de Sets
+                let htmlCabeceraSets = '';
+                if (p.setsDetectados.length > 0) {
+                    htmlCabeceraSets = p.setsDetectados.map(s => `<span class="etiqueta-set-titulo">${s.etiqueta}</span>`).join('');
+                } else {
+                    htmlCabeceraSets = `<span class="etiqueta-set-titulo">SET 1</span>`;
+                }
                 htmlCabeceraSets += `<span class="etiqueta-set-titulo total-titulo">SETS</span>`;
 
-                // Crear los valores por set de Jugador 1
-                let htmlSetsJ1 = p.setsDetectados.map(s => `<span class="badge-set">${s.p1}</span>`).join('');
-                // Crear los valores por set de Jugador 2
-                let htmlSetsJ2 = p.setsDetectados.map(s => `<span class="badge-set">${s.p2}</span>`).join('');
+                // Generar los valores de Sets para cada jugador
+                let htmlSetsJ1 = '';
+                let htmlSetsJ2 = '';
+
+                if (p.setsDetectados.length > 0) {
+                    htmlSetsJ1 = p.setsDetectados.map(s => `<span class="badge-set">${s.p1}</span>`).join('');
+                    htmlSetsJ2 = p.setsDetectados.map(s => `<span class="badge-set">${s.p2}</span>`).join('');
+                } else {
+                    htmlSetsJ1 = `<span class="badge-set">-</span>`;
+                    htmlSetsJ2 = `<span class="badge-set">-</span>`;
+                }
 
                 HTMLTarjetas += `
                     <div class="mini-card-partido">
-                        <!-- ENCABEZADO SIN LA PALABRA PARTIDO -->
-                        <div class="mini-card-header">
-                            <span>${p.fechaHora}</span>
-                        </div>
-
                         <div class="mini-card-body">
                             <!-- Categoría -->
                             <div class="col-categoria">
                                 <span class="tag-categoria">${p.categoria}</span>
                             </div>
 
-                            <!-- Filas Paralelas de Jugadores y Resultados -->
+                            <!-- Jugadores y Sets -->
                             <div class="col-jugadores">
                                 
-                                <!-- Nombre del Set encima de los resultados -->
                                 <div class="cabecera-sets-titulos">
                                     ${htmlCabeceraSets}
                                 </div>
