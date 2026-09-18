@@ -10,7 +10,6 @@
         :root {
             --color-negro: #121212;
             --color-rojo: #e31d2b;
-            --color-rojo-hover: #b8121f;
             --color-blanco: #ffffff;
             --color-gris-fondo: #152241;
             --color-gris-linea: #e2e8f0;
@@ -94,12 +93,6 @@
             color: var(--color-rojo);
         }
 
-        .contenedor-categoria-filtro {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         .select-categoria {
             background-color: #1e1e1e;
             color: var(--color-blanco);
@@ -111,18 +104,6 @@
             cursor: pointer;
             outline: none;
             text-transform: uppercase;
-            transition: all 0.2s ease;
-        }
-
-        .select-categoria:hover, .select-categoria:focus {
-            background-color: var(--color-rojo);
-            border-color: #ffffff;
-        }
-
-        .select-categoria option {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: var(--fuente-secundaria);
         }
 
         .main-container {
@@ -149,15 +130,13 @@
             padding: 8px 20px;
             border-radius: 25px;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-transform: uppercase;
         }
 
-        .btn-dia:hover, .btn-dia.activo {
+        .btn-dia.activo {
             background-color: var(--color-rojo);
             color: var(--color-blanco);
             border-color: var(--color-rojo);
-            box-shadow: 0 4px 10px rgba(227, 29, 43, 0.35);
         }
 
         .loading {
@@ -167,7 +146,6 @@
             font-size: 1.1rem;
         }
 
-        /* --- FORMATO MINI TARJETAS --- */
         #matchesContainer {
             display: flex;
             flex-direction: column;
@@ -180,19 +158,10 @@
             border-radius: 10px;
             padding: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            border: 1px solid var(--color-gris-linea);
             border-left: 5px solid var(--color-rojo);
             display: flex;
             flex-direction: column;
             gap: 10px;
-        }
-
-        .match-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--color-gris-linea);
-            padding-bottom: 6px;
         }
 
         .category-badge {
@@ -201,7 +170,6 @@
             font-size: 1.1rem;
             color: var(--color-rojo);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .player-row {
@@ -211,13 +179,11 @@
             background-color: #f8f9fa;
             padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid #edf2f7;
         }
 
         .player-name {
             font-weight: 600;
             font-size: 1rem;
-            color: var(--color-negro);
         }
 
         .sets-container {
@@ -227,17 +193,14 @@
 
         .set-box {
             background-color: #e2e8f0;
-            color: #2d3748;
             font-family: var(--fuente-principal);
             font-weight: 700;
-            font-size: 0.95rem;
             min-width: 32px;
             height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 4px;
-            padding: 0 4px;
         }
     </style>
 </head>
@@ -252,20 +215,14 @@
             <h1>Torneo de <span class="rojo">Voley</span></h1>
         </div>
 
-        <div class="contenedor-categoria-filtro">
-            <select id="select-categoria" class="select-categoria" onchange="filtrarPorCategoria(this.value)">
-                <option value="TODAS">🏆 Todas las Categorías</option>
-                <option value="SUB 10 MUJERES">Sub 10 Mujeres</option>
-                <option value="SUB 10 VARONES">Sub 10 Varones</option>
-                <option value="SUB 12 MUJERES">Sub 12 Mujeres</option>
-                <option value="SUB 12 VARONES">Sub 12 Varones</option>
-                <option value="SUB 14 MUJERES">Sub 14 Mujeres</option>
-                <option value="SUB 14 VARONES">Sub 14 Varones</option>
-                <option value="SUB 16 MUJERES">Sub 16 Mujeres</option>
-                <option value="SUB 16 VARONES">Sub 16 Varones</option>
-                <option value="SUB 18 VARONES">Sub 18 Varones</option>
-            </select>
-        </div>
+        <select id="select-categoria" class="select-categoria" onchange="filtrarPorCategoria(this.value)">
+            <option value="TODAS">🏆 Todas las Categorías</option>
+            <option value="SUB 10">Sub 10</option>
+            <option value="SUB 12">Sub 12</option>
+            <option value="SUB 14">Sub 14</option>
+            <option value="SUB 16">Sub 16</option>
+            <option value="SUB 18">Sub 18</option>
+        </select>
     </header>
 
     <div class="main-container">
@@ -277,146 +234,120 @@
         </div>
 
         <div id="matchesContainer">
-            <p class="loading">Cargando partidos...</p>
+            <p class="loading">Cargando partidos desde Google Sheets...</p>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_REEMPLAZA_ESTO_CON_TU_ID_DE_SCRIPT/exec'; 
-        const TIEMPO_REFRESCO_MS = 20000;
-
+        // REEMPLAZA ESTA URL CON EL ENLACE CSV DE "PUBLICAR EN LA WEB"
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTT0jBcOmznNTr315_n7fbNgPP0EevI5MaWeXqPfkl73ntbUiFCE9ZodyrhbcalTctAjcFGqfRWGRZs/pub?gid=463646504&single=true&output=csv';
+        
         let rawSheetData = [];
         let diaSeleccionado = 'TODOS';
         let categoriaSeleccionada = 'TODAS';
 
-        function normalizarTexto(txt) {
-            if (txt === null || txt === undefined) return "";
-            return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-        }
+        // Convierte el texto CSV a un Array de objetos de JavaScript
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            if (lines.length === 0) return [];
 
-        // Obtiene el valor de una clave de forma flexible
-        function obtenerValorCamp(fila, listaPosiblesNombres) {
-            const keys = Object.keys(fila);
-            for (let nombre of listaPosiblesNombres) {
-                const keyEncontrada = keys.find(k => normalizarTexto(k).replace(/[^A-Z0-9]/g, "").includes(normalizarTexto(nombre).replace(/[^A-Z0-9]/g, "")));
-                if (keyEncontrada && fila[keyEncontrada] !== undefined && fila[keyEncontrada] !== null) {
-                    const val = String(fila[keyEncontrada]).trim();
-                    if (val !== "") return val;
-                }
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const result = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const currentLine = lines[i].split(',').map(item => item.trim().replace(/^"|"$/g, ''));
+                if (currentLine.length < headers.length) continue;
+
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = currentLine[index] || "";
+                });
+                result.push(obj);
             }
-            return "-";
-        }
-
-        function procesarPartido(fila) {
-            // Nombre de Categoría
-            const category = obtenerValorCamp(fila, ["CATEGORIA", "CAT"]) || "CATEGORÍA";
-
-            // Nombre Jugadores
-            const player1 = obtenerValorCamp(fila, ["JUGADOR 1", "EQUIPO 1", "J1", "LOCAL"]);
-            const player2 = obtenerValorCamp(fila, ["JUGADOR 2", "EQUIPO 2", "J2", "VISITANTE"]);
-
-            // Fecha / Día
-            const dateRaw = obtenerValorCamp(fila, ["FECHA", "DIA", "MARCA TEMPORAL"]);
-
-            // Sets Jugador 1
-            const p1Sets = [
-                obtenerValorCamp(fila, ["SET1_J1", "SET 1 J1", "SET1 J1", "SET1J1", "S1J1"]),
-                obtenerValorCamp(fila, ["SET2_J1", "SET 2 J1", "SET2 J1", "SET2J1", "S2J1"]),
-                obtenerValorCamp(fila, ["SET3_J1", "SET 3 J1", "SET3 J1", "SET3J1", "S3J1"])
-            ];
-
-            // Sets Jugador 2
-            const p2Sets = [
-                obtenerValorCamp(fila, ["SET1_J2", "SET 1 J2", "SET1 J2", "SET1J2", "S1J2"]),
-                obtenerValorCamp(fila, ["SET2_J2", "SET 2 J2", "SET2 J2", "SET2J2", "S2J2"]),
-                obtenerValorCamp(fila, ["SET3_J2", "SET 3 J2", "SET3 J2", "SET3J2", "S3J2"])
-            ];
-
-            return {
-                category,
-                player1: player1 !== "-" ? player1 : "Jugador 1",
-                player2: player2 !== "-" ? player2 : "Jugador 2",
-                dateRaw,
-                p1Sets,
-                p2Sets
-            };
+            return result;
         }
 
         async function cargarDatos() {
             try {
-                const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error('Error al obtener datos');
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                if (!response.ok) throw new Error('No se pudo acceder al enlace CSV');
 
-                const datos = await response.json();
-                if (datos && Array.isArray(datos)) {
-                    rawSheetData = datos;
-                    actualizarListaPartidos();
-                }
+                const csvText = await response.text();
+                rawSheetData = parseCSV(csvText);
+                actualizarListaPartidos();
             } catch (error) {
-                console.warn('Error al actualizar datos:', error);
-                document.getElementById('matchesContainer').innerHTML = '<p class="loading">Error al cargar datos. Verifica la URL del App Script.</p>';
+                console.error('Error al cargar datos:', error);
+                document.getElementById('matchesContainer').innerHTML = `
+                    <p class="loading" style="color: #ff6b6b;">
+                        Error al cargar datos.<br>Asegúrate de haber publicado la hoja como CSV y reemplazado la URL.
+                    </p>`;
             }
         }
 
         function actualizarListaPartidos() {
-            const diaBusqueda = normalizarTexto(diaSeleccionado);
-            const catBusqueda = normalizarTexto(categoriaSeleccionada);
-
-            const partidosFiltrados = rawSheetData.map(procesarPartido).filter(match => {
-                // Filtro por Categoría
-                if (catBusqueda !== 'TODAS') {
-                    if (!normalizarTexto(match.category).includes(catBusqueda)) return false;
-                }
-
-                // Filtro por Día
-                if (diaBusqueda === 'TODOS') return true;
-
-                const fechaNorm = normalizarTexto(match.dateRaw);
-                if (diaBusqueda === "VIERNES" && (fechaNorm.includes("VIERNES") || fechaNorm.includes("VIE"))) return true;
-                if (diaBusqueda === "SABADO" && (fechaNorm.includes("SABADO") || fechaNorm.includes("SAB"))) return true;
-                if (diaBusqueda === "DOMINGO" && (fechaNorm.includes("DOMINGO") || fechaNorm.includes("DOM"))) return true;
-
-                return true; 
-            });
-
-            renderMatches(partidosFiltrados);
-        }
-
-        function renderMatches(matches) {
             const container = document.getElementById('matchesContainer');
             container.innerHTML = '';
 
-            if (matches.length === 0) {
-                container.innerHTML = '<p class="loading">No hay partidos para los filtros seleccionados.</p>';
+            const filtrados = rawSheetData.filter(fila => {
+                const textoFila = JSON.stringify(fila).toUpperCase();
+
+                // Filtro por día
+                if (diaSeleccionado !== 'TODOS') {
+                    if (!textoFila.includes(diaSeleccionado)) return false;
+                }
+
+                // Filtro por categoría
+                if (categoriaSeleccionada !== 'TODAS') {
+                    if (!textoFila.includes(categoriaSeleccionada)) return false;
+                }
+
+                return true;
+            });
+
+            if (filtrados.length === 0) {
+                container.innerHTML = '<p class="loading">No hay partidos registrados para esta selección.</p>';
                 return;
             }
 
-            matches.forEach(match => {
+            filtrados.forEach(fila => {
+                const keys = Object.keys(fila);
+                const values = Object.values(fila);
+
+                // Asignación flexible de columnas según la fila
+                const cat = values[0] || 'CATEGORÍA';
+                const j1 = values[1] || 'Jugador 1';
+                const j2 = values[2] || 'Jugador 2';
+
+                // Búsqueda de sets
+                const s1_j1 = values[3] || '-';
+                const s2_j1 = values[4] || '-';
+                const s3_j1 = values[5] || '-';
+
+                const s1_j2 = values[6] || '-';
+                const s2_j2 = values[7] || '-';
+                const s3_j2 = values[8] || '-';
+
                 const card = document.createElement('div');
                 card.className = 'match-card';
-
                 card.innerHTML = `
-                    <div class="match-header">
-                        <span class="category-badge">${match.category}</span>
-                    </div>
-
-                    <!-- Jugador 1 (J1) -->
+                    <div class="category-badge">${cat}</div>
                     <div class="player-row">
-                        <span class="player-name">${match.player1}</span>
+                        <span class="player-name">${j1}</span>
                         <div class="sets-container">
-                            ${match.p1Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
+                            <span class="set-box">${s1_j1}</span>
+                            <span class="set-box">${s2_j1}</span>
+                            <span class="set-box">${s3_j1}</span>
                         </div>
                     </div>
-
-                    <!-- Jugador 2 (J2) -->
                     <div class="player-row">
-                        <span class="player-name">${match.player2}</span>
+                        <span class="player-name">${j2}</span>
                         <div class="sets-container">
-                            ${match.p2Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
+                            <span class="set-box">${s1_j2}</span>
+                            <span class="set-box">${s2_j2}</span>
+                            <span class="set-box">${s3_j2}</span>
                         </div>
                     </div>
                 `;
-
                 container.appendChild(card);
             });
         }
@@ -424,12 +355,7 @@
         function filtrarPorDia(dia) {
             diaSeleccionado = dia;
             document.querySelectorAll('.btn-dia').forEach(btn => {
-                const btnTexto = normalizarTexto(btn.textContent);
-                if (btnTexto.includes(normalizarTexto(dia))) {
-                    btn.classList.add('activo');
-                } else {
-                    btn.classList.remove('activo');
-                }
+                btn.classList.toggle('activo', btn.textContent.toUpperCase().includes(dia));
             });
             actualizarListaPartidos();
         }
@@ -440,7 +366,7 @@
         }
 
         cargarDatos();
-        setInterval(cargarDatos, TIEMPO_REFRESCO_MS);
+        setInterval(cargarDatos, 15000); // Actualiza cada 15 segundos
     </script>
 </body>
 </html>
