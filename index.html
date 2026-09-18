@@ -130,7 +130,7 @@
         }
 
         .main-container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
             padding: 0 15px;
         }
@@ -174,7 +174,7 @@
 
         #estado.oculto { display: none !important; }
 
-        /* --- NUEVO DISEÑO DE MINI TARJETAS PARALELAS --- */
+        /* --- MINI TARJETAS DINÁMICAS Y PARALELAS --- */
         .grid-partidos {
             display: flex;
             flex-direction: column;
@@ -184,7 +184,7 @@
         .mini-card-partido {
             background-color: var(--color-blanco);
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             overflow: hidden;
             border: 1px solid var(--color-gris-linea);
         }
@@ -194,11 +194,11 @@
             color: var(--color-blanco);
             padding: 6px 15px;
             font-family: var(--fuente-principal);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--color-rojo);
+            border-bottom: 3px solid var(--color-rojo);
             letter-spacing: 0.5px;
         }
 
@@ -209,26 +209,27 @@
             gap: 15px;
         }
 
-        /* Columna izquierda de categoría */
+        /* Columna Categoría */
         .col-categoria {
-            width: 130px;
+            width: 140px;
             flex-shrink: 0;
             border-right: 2px solid var(--color-gris-linea);
             padding-right: 12px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .tag-categoria {
             font-family: var(--fuente-principal);
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--color-rojo);
             text-transform: uppercase;
             line-height: 1.2;
         }
 
-        /* Columna derecha con los dos enfrentamientos en filas paralelas */
+        /* Columna Filas Jugadores Parallelas */
         .col-jugadores {
             flex-grow: 1;
             display: flex;
@@ -240,15 +241,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-radius: 6px;
             background-color: #f8f9fa;
-            transition: background 0.2s ease;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
         }
 
         .fila-jugador.ganador {
             background-color: var(--color-ganador-bg);
-            border: 1px solid #c8e6c9;
+            border-color: #a5d6a7;
         }
 
         .nombre-jugador {
@@ -268,22 +270,36 @@
         .resultados-sets {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
+        /* Badges de Sets / Puntos */
         .badge-set {
-            background-color: var(--color-negro);
-            color: var(--color-blanco);
+            background-color: #e2e8f0;
+            color: var(--color-negro);
             font-family: var(--fuente-principal);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            padding: 3px 10px;
+            padding: 2px 8px;
             border-radius: 4px;
-            min-width: 32px;
+            min-width: 28px;
             text-align: center;
         }
 
-        .fila-jugador.ganador .badge-set {
+        .badge-set.parcial {
+            background-color: #edf2f7;
+            color: #4a5568;
+            font-size: 0.85rem;
+        }
+
+        .badge-set.total {
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            font-size: 1.1rem;
+            padding: 3px 10px;
+        }
+
+        .fila-jugador.ganador .badge-set.total {
             background-color: var(--color-rojo);
             box-shadow: 0 2px 6px rgba(227, 29, 43, 0.4);
         }
@@ -295,8 +311,8 @@
             font-size: 1.1rem;
         }
 
-        /* Adaptación para pantallas móviles */
-        @media (max-width: 600px) {
+        /* Adaptación móvil */
+        @media (max-width: 650px) {
             header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -319,6 +335,14 @@
                 border-bottom: 1px dashed var(--color-gris-linea);
                 padding-right: 0;
                 padding-bottom: 8px;
+            }
+
+            .fila-jugador {
+                padding: 6px 8px;
+            }
+
+            .nombre-jugador {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -438,61 +462,103 @@
             return null;
         }
 
-        function obtenerDatosPartido(fila, keys) {
-            let j1 = "Jugador / Equipo 1", j2 = "Jugador / Equipo 2";
-            let res1 = "-", res2 = "-";
-            let cat = "CATEGORÍA";
+        /**
+         * PROCESAMIENTO DINÁMICO DE FILAS RECIBIDAS DEL SHEET
+         * Extrae automáticamente:
+         * - Jugador 1 / Equipo 1
+         * - Jugador 2 / Equipo 2
+         * - Resultados parciales por Set (p. ej. Set 1: 25-20)
+         * - Puntos / Sets totales finales
+         * - Categoría y Fecha/Hora
+         */
+        function procesarFilaDinamica(fila) {
+            const keys = Object.keys(fila);
+
+            let j1Nombre = "Jugador 1";
+            let j2Nombre = "Jugador 2";
+            let categoria = "CATEGORÍA";
             let fechaHora = "";
 
-            keys.forEach(k => {
-                const norm = normalizarTexto(k);
-                const val = fila[k] !== undefined && fila[k] !== null ? String(fila[k]).trim() : "";
+            let setsParcialesJ1 = [];
+            let setsParcialesJ2 = [];
+            
+            let totalJ1 = null;
+            let totalJ2 = null;
 
-                if (norm.includes("MARCA") || norm.includes("TEMPORAL") || norm.includes("DIA") || norm.includes("FECHA")) {
-                    if (val) fechaHora = val;
-                } else if (norm.includes("CATEGORIA")) {
-                    if (val) cat = val;
-                } else if (norm.includes("EQUIPO 1") || norm.includes("JUGADOR 1") || norm.includes("LOCAL")) {
-                    if (norm.includes("SET") || norm.includes("PUNTOS") || norm.includes("SCORE")) {
-                        res1 = val || "-";
-                    } else {
-                        j1 = val || "Jugador 1";
-                    }
-                } else if (norm.includes("EQUIPO 2") || norm.includes("JUGADOR 2") || norm.includes("VISITANTE")) {
-                    if (norm.includes("SET") || norm.includes("PUNTOS") || norm.includes("SCORE")) {
-                        res2 = val || "-";
-                    } else {
-                        j2 = val || "Jugador 2";
+            // 1. Identificar columnas clave por coincidencias semánticas
+            keys.forEach(key => {
+                const kNorm = normalizarTexto(key);
+                const val = fila[key] !== undefined && fila[key] !== null ? String(fila[key]).trim() : "";
+
+                if (!val) return;
+
+                // Fecha / Hora / Marca
+                if (kNorm.includes("MARCA") || kNorm.includes("TEMPORAL") || kNorm.includes("FECHA") || kNorm.includes("DIA")) {
+                    fechaHora = val;
+                }
+                // Categoría
+                else if (kNorm.includes("CATEGORIA")) {
+                    categoria = val;
+                }
+                // Nombre Jugador / Equipo 1
+                else if ((kNorm.includes("JUGADOR 1") || kNorm.includes("EQUIPO 1") || kNorm.includes("LOCAL") || kNorm.includes("CLUB 1")) && !kNorm.includes("SET") && !kNorm.includes("RESULTADO") && !kNorm.includes("PUNTO")) {
+                    j1Nombre = val;
+                }
+                // Nombre Jugador / Equipo 2
+                else if ((kNorm.includes("JUGADOR 2") || kNorm.includes("EQUIPO 2") || kNorm.includes("VISITANTE") || kNorm.includes("CLUB 2")) && !kNorm.includes("SET") && !kNorm.includes("RESULTADO") && !kNorm.includes("PUNTO")) {
+                    j2Nombre = val;
+                }
+                // Sets Totales explícitos
+                else if ((kNorm.includes("SETS 1") || kNorm.includes("RESULTADO 1") || kNorm.includes("PUNTOS 1")) && !kNorm.includes("PARCIAL")) {
+                    totalJ1 = parseInt(val, 10);
+                }
+                else if ((kNorm.includes("SETS 2") || kNorm.includes("RESULTADO 2") || kNorm.includes("PUNTOS 2")) && !kNorm.includes("PARCIAL")) {
+                    totalJ2 = parseInt(val, 10);
+                }
+                // Columnas de Set individual (p.ej "SET 1", "SET 2", "SET 3")
+                else if (kNorm.includes("SET")) {
+                    if (val.includes("-")) {
+                        const partes = val.split("-");
+                        const p1 = parseInt(partes[0], 10);
+                        const p2 = parseInt(partes[1], 10);
+                        if (!isNaN(p1) && !isNaN(p2)) {
+                            setsParcialesJ1.push(p1);
+                            setsParcialesJ2.push(p2);
+                        }
                     }
                 }
             });
 
-            // Si los sets/puntos no vinieron explícitamente en columnas "Equipo 1 Sets", buscamos columnas "SET 1", "SET 2", etc.
-            if (res1 === "-" && res2 === "-") {
-                let p1Total = 0, p2Total = 0, seJugo = false;
-                keys.forEach(k => {
-                    const norm = normalizarTexto(k);
-                    if (norm.includes("SET")) {
-                        const val = String(fila[k] || "").trim();
-                        if (val.includes("-")) {
-                            const partes = val.split("-");
-                            const p1 = parseInt(partes[0], 10);
-                            const p2 = parseInt(partes[1], 10);
-                            if (!isNaN(p1) && !isNaN(p2)) {
-                                seJugo = true;
-                                if (p1 > p2) p1Total++;
-                                else if (p2 > p1) p2Total++;
-                            }
-                        }
-                    }
-                });
-                if (seJugo) {
-                    res1 = p1Total;
-                    res2 = p2Total;
+            // Fallback si no se detectaron nombres explícitamente pero hay valores en columnas
+            if (j1Nombre === "Jugador 1" && keys.length >= 2) {
+                const k1 = keys.find(k => normalizarTexto(k).includes("1") && !normalizarTexto(k).includes("SET"));
+                if (k1 && fila[k1]) j1Nombre = fila[k1];
+            }
+            if (j2Nombre === "Jugador 2" && keys.length >= 3) {
+                const k2 = keys.find(k => normalizarTexto(k).includes("2") && !normalizarTexto(k).includes("SET"));
+                if (k2 && fila[k2]) j2Nombre = fila[k2];
+            }
+
+            // Calcular Sets totales ganados si no venían en una columna dedicada
+            if ((totalJ1 === null || isNaN(totalJ1)) && setsParcialesJ1.length > 0) {
+                totalJ1 = 0;
+                totalJ2 = 0;
+                for (let i = 0; i < setsParcialesJ1.length; i++) {
+                    if (setsParcialesJ1[i] > setsParcialesJ2[i]) totalJ1++;
+                    else if (setsParcialesJ2[i] > setsParcialesJ1[i]) totalJ2++;
                 }
             }
 
-            return { j1, j2, res1, res2, cat, fechaHora };
+            return {
+                j1Nombre,
+                j2Nombre,
+                categoria,
+                fechaHora,
+                setsParcialesJ1,
+                setsParcialesJ2,
+                totalJ1: totalJ1 !== null && !isNaN(totalJ1) ? totalJ1 : "-",
+                totalJ2: totalJ2 !== null && !isNaN(totalJ2) ? totalJ2 : "-"
+            };
         }
 
         function renderizarTarjetas() {
@@ -540,42 +606,52 @@
             let HTMLTarjetas = '';
 
             datosFiltrados.forEach(fila => {
-                const info = obtenerDatosPartido(fila, keys);
+                const p = procesarFilaDinamica(fila);
 
-                const num1 = parseInt(info.res1, 10);
-                const num2 = parseInt(info.res2, 10);
+                const t1 = parseInt(p.totalJ1, 10);
+                const t2 = parseInt(p.totalJ2, 10);
 
-                let j1EsGanador = !isNaN(num1) && !isNaN(num2) && num1 > num2;
-                let j2EsGanador = !isNaN(num1) && !isNaN(num2) && num2 > num1;
+                const j1Gana = !isNaN(t1) && !isNaN(t2) && t1 > t2;
+                const j2Gana = !isNaN(t1) && !isNaN(t2) && t2 > t1;
+
+                // Renderizar Badges de Sets Parciales para Jugador 1
+                let htmlParcialesJ1 = p.setsParcialesJ1.map(pts => `<span class="badge-set parcial">${pts}</span>`).join('');
+                // Renderizar Badges de Sets Parciales para Jugador 2
+                let htmlParcialesJ2 = p.setsParcialesJ2.map(pts => `<span class="badge-set parcial">${pts}</span>`).join('');
 
                 HTMLTarjetas += `
                     <div class="mini-card-partido">
                         <div class="mini-card-header">
                             <span>PARTIDO</span>
-                            <span>${info.fechaHora}</span>
+                            <span>${p.fechaHora}</span>
                         </div>
                         <div class="mini-card-body">
+                            <!-- Columna Categoría -->
                             <div class="col-categoria">
-                                <span class="tag-categoria">${info.cat}</span>
+                                <span class="tag-categoria">${p.categoria}</span>
                             </div>
+
+                            <!-- Columna Jugadores y Resultados en Paralelo -->
                             <div class="col-jugadores">
-                                <!-- Jugador / Equipo 1 -->
-                                <div class="fila-jugador ${j1EsGanador ? 'ganador' : ''}">
+                                <!-- FILA JUGADOR 1 (ARRIBA) -->
+                                <div class="fila-jugador ${j1Gana ? 'ganador' : ''}">
                                     <span class="nombre-jugador">
-                                        ${j1EsGanador ? '🏆 ' : ''}${info.j1}
+                                        ${j1Gana ? '🏆 ' : ''}${p.j1Nombre}
                                     </span>
                                     <div class="resultados-sets">
-                                        <span class="badge-set">${info.res1}</span>
+                                        ${htmlParcialesJ1}
+                                        <span class="badge-set total">${p.totalJ1}</span>
                                     </div>
                                 </div>
-                                
-                                <!-- Jugador / Equipo 2 -->
-                                <div class="fila-jugador ${j2EsGanador ? 'ganador' : ''}">
+
+                                <!-- FILA JUGADOR 2 (ABAJO Y EN PARALELO) -->
+                                <div class="fila-jugador ${j2Gana ? 'ganador' : ''}">
                                     <span class="nombre-jugador">
-                                        ${j2EsGanador ? '🏆 ' : ''}${info.j2}
+                                        ${j2Gana ? '🏆 ' : ''}${p.j2Nombre}
                                     </span>
                                     <div class="resultados-sets">
-                                        <span class="badge-set">${info.res2}</span>
+                                        ${htmlParcialesJ2}
+                                        <span class="badge-set total">${p.totalJ2}</span>
                                     </div>
                                 </div>
                             </div>
