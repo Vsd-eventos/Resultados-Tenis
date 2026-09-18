@@ -11,8 +11,6 @@
             --color-negro: #121212;
             --color-rojo: #e31d2b;
             --color-rojo-hover: #b8121f;
-            --color-ganador: #1b5e20;
-            --color-ganador-bg: #e8f5e9;
             --color-blanco: #ffffff;
             --color-gris-fondo: #152241;
             --color-gris-linea: #e2e8f0;
@@ -33,7 +31,6 @@
             padding-bottom: 50px;
         }
 
-        /* --- ENCABEZADO PRINCIPAL --- */
         header {
             background-color: var(--color-negro);
             color: var(--color-blanco);
@@ -129,7 +126,7 @@
         }
 
         .main-container {
-            max-width: 950px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 0 15px;
         }
@@ -163,189 +160,84 @@
             box-shadow: 0 4px 10px rgba(227, 29, 43, 0.35);
         }
 
-        #estado {
-            text-align: center;
-            font-size: 0.95rem;
-            color: #ffffff;
-            margin-bottom: 18px;
-            font-weight: 500;
-        }
-
-        #estado.oculto { display: none !important; }
-
-        /* --- TARJETAS --- */
-        .grid-partidos {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .mini-card-partido {
-            background-color: var(--color-blanco);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            overflow: hidden;
-            border: 1px solid var(--color-gris-linea);
-            border-top: 4px solid var(--color-rojo);
-        }
-
-        .mini-card-body {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            gap: 15px;
-        }
-
-        .col-categoria {
-            width: 140px;
-            flex-shrink: 0;
-            border-right: 2px solid var(--color-gris-linea);
-            padding-right: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .tag-categoria {
-            font-family: var(--fuente-principal);
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--color-rojo);
-            text-transform: uppercase;
-            line-height: 1.2;
-        }
-
-        .col-jugadores {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        /* Cabeceras sobre los resultados de los Sets */
-        .cabecera-sets-titulos {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 6px;
-            padding-right: 2px;
-        }
-
-        .etiqueta-set-titulo {
-            font-family: var(--fuente-principal);
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #718096;
-            min-width: 34px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .etiqueta-set-titulo.total-titulo {
-            min-width: 40px;
-            color: var(--color-negro);
-        }
-
-        .fila-jugador {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 6px;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            transition: all 0.2s ease;
-        }
-
-        .fila-jugador.ganador {
-            background-color: var(--color-ganador-bg);
-            border-color: #a5d6a7;
-        }
-
-        .nombre-jugador {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--color-negro);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .fila-jugador.ganador .nombre-jugador {
-            color: var(--color-ganador);
-            font-weight: 700;
-        }
-
-        .resultados-sets {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .badge-set {
-            background-color: #edf2f7;
-            color: #2d3748;
-            font-family: var(--fuente-principal);
-            font-size: 0.95rem;
-            font-weight: 700;
-            padding: 3px 6px;
-            border-radius: 4px;
-            min-width: 34px;
-            text-align: center;
-        }
-
-        .badge-set.total {
-            background-color: var(--color-negro);
-            color: var(--color-blanco);
-            font-size: 1.05rem;
-            padding: 3px 8px;
-            min-width: 40px;
-        }
-
-        .fila-jugador.ganador .badge-set.total {
-            background-color: var(--color-rojo);
-            box-shadow: 0 2px 6px rgba(227, 29, 43, 0.4);
-        }
-
-        .sin-resultados {
+        .loading {
             color: var(--color-blanco);
             text-align: center;
-            padding: 40px 0;
+            padding: 30px 0;
             font-size: 1.1rem;
         }
 
-        @media (max-width: 650px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .header-brand, .contenedor-categoria-filtro, .select-categoria {
-                width: 100%;
-            }
-            header h1 { font-size: 1.4rem; }
-            
-            .mini-card-body {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            
-            .col-categoria {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px dashed var(--color-gris-linea);
-                padding-right: 0;
-                padding-bottom: 8px;
-            }
+        /* --- ESTILOS DE TUS MINI TARJETAS --- */
+        #matchesContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
 
-            .fila-jugador {
-                padding: 6px 8px;
-            }
+        .match-card {
+            background-color: var(--color-blanco);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            border: 1px solid var(--color-gris-linea);
+            border-left: 5px solid var(--color-rojo);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-            .nombre-jugador {
-                font-size: 0.9rem;
-            }
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-gris-linea);
+            padding-bottom: 6px;
+        }
+
+        .category-badge {
+            font-family: var(--fuente-principal);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--color-rojo);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #edf2f7;
+        }
+
+        .player-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--color-negro);
+        }
+
+        .sets-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        .set-box {
+            background-color: #e2e8f0;
+            color: #2d3748;
+            font-family: var(--fuente-principal);
+            font-weight: 700;
+            font-size: 0.95rem;
+            min-width: 32px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            padding: 0 4px;
         }
     </style>
 </head>
@@ -384,16 +276,16 @@
             <button class="btn-dia activo" onclick="filtrarPorDia('TODOS')">Todos los Días</button>
         </div>
 
-        <div id="estado">Cargando resultados...</div>
-
-        <div class="grid-partidos" id="contenedor-tarjetas"></div>
+        <div id="matchesContainer">
+            <p class="loading">Cargando partidos...</p>
+        </div>
     </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_REEMPLAZA_ESTO_CON_TU_ID_DE_SCRIPT/exec'; 
         const TIEMPO_REFRESCO_MS = 20000;
 
-        let todosLosDatos = [];
+        let rawSheetData = [];
         let diaSeleccionado = 'TODOS';
         let categoriaSeleccionada = 'TODAS';
 
@@ -402,263 +294,157 @@
             return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
-        async function cargarDatos() {
-            const datosCache = localStorage.getItem('vsd_resultados_cache');
-            if (datosCache && todosLosDatos.length === 0) {
-                try {
-                    todosLosDatos = JSON.parse(datosCache);
-                    renderizarTarjetas();
-                    document.getElementById('estado').classList.add('oculto');
-                } catch (e) {
-                    console.error("Error leyendo caché", e);
-                }
-            }
-
-            try {
-                const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error('Error de conexión');
-
-                const datos = await response.json();
-                if (datos && Array.isArray(datos) && datos.length > 0) {
-                    todosLosDatos = datos;
-                    localStorage.setItem('vsd_resultados_cache', JSON.stringify(datos));
-                    renderizarTarjetas();
-                }
-                document.getElementById('estado').classList.add('oculto');
-            } catch (error) {
-                console.warn('Cargando con respaldo local', error);
-                document.getElementById('estado').classList.add('oculto');
-            }
-        }
-
-        function filtrarPorDia(dia) {
-            diaSeleccionado = normalizarTexto(dia);
-            document.querySelectorAll('.btn-dia').forEach(btn => {
-                const btnTexto = normalizarTexto(btn.textContent);
-                if (btnTexto.includes(diaSeleccionado) || (diaSeleccionado === 'SABADO' && btnTexto.includes('SABADO'))) {
-                    btn.classList.add('activo');
-                } else {
-                    btn.classList.remove('activo');
-                }
-            });
-            renderizarTarjetas();
-        }
-
-        function filtrarPorCategoria(cat) {
-            categoriaSeleccionada = cat;
-            renderizarTarjetas();
-        }
-
-        function parsearFechaLatino(fechaStr) {
-            if (!fechaStr) return null;
-            const str = String(fechaStr).trim();
-            const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
-            if (match) {
-                const dia = parseInt(match[1], 10);
-                const mes = parseInt(match[2], 10) - 1; 
-                let anio = parseInt(match[3], 10);
-                if (anio < 100) anio += 2000;
-                const f = new Date(anio, mes, dia);
-                if (!isNaN(f.getTime())) return f;
-            }
-            return null;
-        }
-
-        /**
-         * PROCESAMIENTO DINÁMICO MEJORADO
-         * Detecta columnas de sets tanto si vienen como "SET 1", "SET 2"
-         * como si vienen con puntuación directa "25-18", "25-20" o puntuaciones separadas.
-         */
-        function procesarFilaDinamica(fila) {
+        // Convierte las filas crudas del Sheet al objeto estructurado que usa tu renderMatches
+        function procesarPartido(fila) {
             const keys = Object.keys(fila);
 
-            let j1Nombre = "Jugador 1";
-            let j2Nombre = "Jugador 2";
-            let categoria = "CATEGORÍA";
+            let category = "CATEGORÍA";
+            let player1 = "Jugador 1";
+            let player2 = "Jugador 2";
+            let dateRaw = "";
 
-            let setsDetectados = [];
-            let totalJ1 = null;
-            let totalJ2 = null;
+            let p1Sets = [];
+            let p2Sets = [];
 
             keys.forEach(key => {
                 const kNorm = normalizarTexto(key);
                 const val = fila[key] !== undefined && fila[key] !== null ? String(fila[key]).trim() : "";
 
-                // Detección de Categoría
                 if (kNorm.includes("CATEGORIA")) {
-                    if (val) categoria = val;
+                    if (val) category = val;
                 }
-                // Detección de Jugadores
-                else if ((kNorm.includes("JUGADOR 1") || kNorm.includes("EQUIPO 1") || kNorm.includes("LOCAL") || kNorm.includes("CLUB 1")) && !kNorm.includes("SET") && !kNorm.includes("RESULTADO")) {
-                    if (val) j1Nombre = val;
+                else if ((kNorm.includes("JUGADOR 1") || kNorm.includes("EQUIPO 1") || kNorm.includes("LOCAL")) && !kNorm.includes("SET")) {
+                    if (val) player1 = val;
                 }
-                else if ((kNorm.includes("JUGADOR 2") || kNorm.includes("EQUIPO 2") || kNorm.includes("VISITANTE") || kNorm.includes("CLUB 2")) && !kNorm.includes("SET") && !kNorm.includes("RESULTADO")) {
-                    if (val) j2Nombre = val;
+                else if ((kNorm.includes("JUGADOR 2") || kNorm.includes("EQUIPO 2") || kNorm.includes("VISITANTE")) && !kNorm.includes("SET")) {
+                    if (val) player2 = val;
                 }
-                // Detección de Totales si existiera columna explícita
-                else if ((kNorm.includes("TOTAL 1") || kNorm.includes("SETS 1")) && !kNorm.includes("PARCIAL")) {
-                    if (val !== "") totalJ1 = parseInt(val, 10);
+                else if (kNorm.includes("MARCA") || kNorm.includes("TEMPORAL") || kNorm.includes("FECHA")) {
+                    if (val) dateRaw = val;
                 }
-                else if ((kNorm.includes("TOTAL 2") || kNorm.includes("SETS 2")) && !kNorm.includes("PARCIAL")) {
-                    if (val !== "") totalJ2 = parseInt(val, 10);
-                }
-                // Detección de Sets (Puntos de cada set)
+                // Sets
                 else if (kNorm.includes("SET")) {
-                    let p1 = 0, p2 = 0;
-                    let numSetMatch = kNorm.match(/\d+/);
-                    let numSet = numSetMatch ? numSetMatch[0] : (setsDetectados.length + 1);
-
-                    // Formato "25-18" o "25 - 18"
                     const matchGion = val.match(/^(\d+)\s*[\-\:]\s*(\d+)$/);
                     if (matchGion) {
-                        p1 = parseInt(matchGion[1], 10);
-                        p2 = parseInt(matchGion[2], 10);
-                        setsDetectados.push({ etiqueta: `SET ${numSet}`, p1, p2 });
-                    } else if (val !== "" && !isNaN(parseInt(val, 10))) {
-                        // Si el valor es solo un número de puntos de ese set
-                        setsDetectados.push({ etiqueta: `SET ${numSet}`, p1: parseInt(val, 10), p2: 0 });
+                        p1Sets.push(matchGion[1]);
+                        p2Sets.push(matchGion[2]);
+                    } else if (val !== "") {
+                        p1Sets.push(val);
+                        p2Sets.push("-");
                     }
                 }
             });
 
-            // Fallback: Si no vinieron los totales definidos en columnas dedicadas, calculamos los sets ganados por cada jugador
-            let setsGanadosJ1 = 0;
-            let setsGanadosJ2 = 0;
-
-            setsDetectados.forEach(s => {
-                if (s.p1 > s.p2) setsGanadosJ1++;
-                else if (s.p2 > s.p1) setsGanadosJ2++;
-            });
-
-            if (totalJ1 === null || isNaN(totalJ1)) totalJ1 = setsGanadosJ1;
-            if (totalJ2 === null || isNaN(totalJ2)) totalJ2 = setsGanadosJ2;
+            // Si no vinieron sets, coloca guión por defecto
+            if (p1Sets.length === 0) p1Sets = ["-"];
+            if (p2Sets.length === 0) p2Sets = ["-"];
 
             return {
-                j1Nombre,
-                j2Nombre,
-                categoria,
-                setsDetectados,
-                totalJ1,
-                totalJ2
+                category,
+                player1,
+                player2,
+                dateRaw,
+                p1Sets,
+                p2Sets
             };
         }
 
-        function renderizarTarjetas() {
-            const contenedor = document.getElementById('contenedor-tarjetas');
-            if (!contenedor || todosLosDatos.length === 0) return;
+        // Carga de datos desde Google Sheets
+        async function cargarDatos() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error('Error al obtener datos');
 
-            const keys = Object.keys(todosLosDatos[0]);
-            const keyMarcaTemporal = keys.find(k => normalizarTexto(k).includes("MARCA") || normalizarTexto(k).includes("TEMPORAL") || normalizarTexto(k).includes("FECHA")) || keys[0];
-            const keyCategoria = keys.find(k => normalizarTexto(k).includes("CATEGORIA"));
+                const datos = await response.json();
+                if (datos && Array.isArray(datos)) {
+                    rawSheetData = datos;
+                    actualizarListaPartidos();
+                }
+            } catch (error) {
+                console.warn('Error al actualizar datos:', error);
+            }
+        }
 
+        function actualizarListaPartidos() {
             const diaBusqueda = normalizarTexto(diaSeleccionado);
             const catBusqueda = normalizarTexto(categoriaSeleccionada);
 
-            const datosFiltrados = todosLosDatos.filter(fila => {
-                if (catBusqueda !== 'TODAS' && keyCategoria) {
-                    if (!normalizarTexto(fila[keyCategoria]).includes(catBusqueda)) return false;
+            const partidosFiltrados = rawSheetData.map(procesarPartido).filter(match => {
+                // Filtro por Categoría
+                if (catBusqueda !== 'TODAS') {
+                    if (!normalizarTexto(match.category).includes(catBusqueda)) return false;
                 }
-                
+
+                // Filtro por Día
                 if (diaBusqueda === 'TODOS') return true;
 
-                const valorMarca = fila[keyMarcaTemporal];
-                if (!valorMarca) return false;
-
-                const txtNorm = normalizarTexto(valorMarca);
-                if (diaBusqueda === "VIERNES" && (txtNorm.includes("VIERNES") || txtNorm.includes("VIE"))) return true;
-                if (diaBusqueda === "SABADO" && (txtNorm.includes("SABADO") || txtNorm.includes("SAB"))) return true;
-                if (diaBusqueda === "DOMINGO" && (txtNorm.includes("DOMINGO") || txtNorm.includes("DOM"))) return true;
-
-                const fecha = parsearFechaLatino(valorMarca);
-                if (fecha) {
-                    const numDia = fecha.getDay(); 
-                    if (diaBusqueda === 'VIERNES' && numDia === 5) return true;
-                    if (diaBusqueda === 'SABADO' && numDia === 6) return true;
-                    if (diaBusqueda === 'DOMINGO' && numDia === 0) return true;
-                }
+                const fechaNorm = normalizarTexto(match.dateRaw);
+                if (diaBusqueda === "VIERNES" && (fechaNorm.includes("VIERNES") || fechaNorm.includes("VIE"))) return true;
+                if (diaBusqueda === "SABADO" && (fechaNorm.includes("SABADO") || fechaNorm.includes("SAB"))) return true;
+                if (diaBusqueda === "DOMINGO" && (fechaNorm.includes("DOMINGO") || fechaNorm.includes("DOM"))) return true;
 
                 return false;
             });
 
-            if (datosFiltrados.length === 0) {
-                contenedor.innerHTML = `<div class="sin-resultados">No hay registros para mostrar con los filtros seleccionados.</div>`;
+            renderMatches(partidosFiltrados);
+        }
+
+        // FIX 3: Renderizado en formato de Mini Tarjetas (Sin fecha)
+        function renderMatches(matches) {
+            const container = document.getElementById('matchesContainer');
+            container.innerHTML = '';
+
+            if (matches.length === 0) {
+                container.innerHTML = '<p class="loading">No hay partidos para los filtros seleccionados.</p>';
                 return;
             }
 
-            let HTMLTarjetas = '';
+            matches.forEach(match => {
+                const card = document.createElement('div');
+                card.className = 'match-card';
 
-            datosFiltrados.forEach(fila => {
-                const p = procesarFilaDinamica(fila);
+                card.innerHTML = `
+                    <div class="match-header">
+                        <span class="category-badge">${match.category}</span>
+                    </div>
 
-                // Determinar quién tiene más sets ganados
-                const j1Gana = p.totalJ1 > p.totalJ2;
-                const j2Gana = p.totalJ2 > p.totalJ1;
+                    <!-- Jugador 1 arriba con sus sets al lado -->
+                    <div class="player-row">
+                        <span class="player-name">${match.player1}</span>
+                        <div class="sets-container">
+                            ${match.p1Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
+                        </div>
+                    </div>
 
-                // Generar cabeceras superiores de Sets
-                let htmlCabeceraSets = '';
-                if (p.setsDetectados.length > 0) {
-                    htmlCabeceraSets = p.setsDetectados.map(s => `<span class="etiqueta-set-titulo">${s.etiqueta}</span>`).join('');
-                } else {
-                    htmlCabeceraSets = `<span class="etiqueta-set-titulo">SET 1</span>`;
-                }
-                htmlCabeceraSets += `<span class="etiqueta-set-titulo total-titulo">SETS</span>`;
-
-                // Generar los valores de Sets para cada jugador
-                let htmlSetsJ1 = '';
-                let htmlSetsJ2 = '';
-
-                if (p.setsDetectados.length > 0) {
-                    htmlSetsJ1 = p.setsDetectados.map(s => `<span class="badge-set">${s.p1}</span>`).join('');
-                    htmlSetsJ2 = p.setsDetectados.map(s => `<span class="badge-set">${s.p2}</span>`).join('');
-                } else {
-                    htmlSetsJ1 = `<span class="badge-set">-</span>`;
-                    htmlSetsJ2 = `<span class="badge-set">-</span>`;
-                }
-
-                HTMLTarjetas += `
-                    <div class="mini-card-partido">
-                        <div class="mini-card-body">
-                            <!-- Categoría -->
-                            <div class="col-categoria">
-                                <span class="tag-categoria">${p.categoria}</span>
-                            </div>
-
-                            <!-- Jugadores y Sets -->
-                            <div class="col-jugadores">
-                                
-                                <div class="cabecera-sets-titulos">
-                                    ${htmlCabeceraSets}
-                                </div>
-
-                                <!-- Fila Jugador 1 -->
-                                <div class="fila-jugador ${j1Gana ? 'ganador' : ''}">
-                                    <span class="nombre-jugador">
-                                        ${j1Gana ? '🏆 ' : ''}${p.j1Nombre}
-                                    </span>
-                                    <div class="resultados-sets">
-                                        ${htmlSetsJ1}
-                                        <span class="badge-set total">${p.totalJ1}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Fila Jugador 2 -->
-                                <div class="fila-jugador ${j2Gana ? 'ganador' : ''}">
-                                    <span class="nombre-jugador">
-                                        ${j2Gana ? '🏆 ' : ''}${p.j2Nombre}
-                                    </span>
-                                    <div class="resultados-sets">
-                                        ${htmlSetsJ2}
-                                        <span class="badge-set total">${p.totalJ2}</span>
-                                    </div>
-                                </div>
-
-                            </div>
+                    <!-- Jugador 2 en paralelo justo abajo con sus sets al lado -->
+                    <div class="player-row">
+                        <span class="player-name">${match.player2}</span>
+                        <div class="sets-container">
+                            ${match.p2Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
                         </div>
                     </div>
                 `;
-            });
 
-            contenedor.innerHTML = HTMLTarjetas;
+                container.appendChild(card);
+            });
+        }
+
+        function filtrarPorDia(dia) {
+            diaSeleccionado = dia;
+            document.querySelectorAll('.btn-dia').forEach(btn => {
+                const btnTexto = normalizarTexto(btn.textContent);
+                if (btnTexto.includes(normalizarTexto(dia))) {
+                    btn.classList.add('activo');
+                } else {
+                    btn.classList.remove('activo');
+                }
+            });
+            actualizarListaPartidos();
+        }
+
+        function filtrarPorCategoria(cat) {
+            categoriaSeleccionada = cat;
+            actualizarListaPartidos();
         }
 
         cargarDatos();
