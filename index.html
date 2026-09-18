@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- FIX 1: Título de la pestaña -->
   <title>TORNEO DE TENIS</title>
+  
   <style>
     :root {
-      --primary-color: #2c3e50;
-      --accent-color: #27ae60;
-      --bg-color: #f4f6f9;
+      --primary: #2c3e50;
+      --accent: #27ae60;
+      --bg: #f4f6f9;
       --card-bg: #ffffff;
-      --border-color: #e2e8f0;
-      --text-color: #333333;
+      --border: #e2e8f0;
+      --text: #2d3748;
+      --text-muted: #718096;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       margin: 0;
       padding: 20px;
     }
@@ -27,211 +30,228 @@
       margin: 0 auto;
     }
 
+    /* FIX 1: Título principal */
     h1 {
       text-align: center;
-      color: var(--primary-color);
+      color: var(--primary);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       margin-bottom: 25px;
     }
 
-    /* Filtros por día */
-    .filter-container {
+    /* FIX 2: Contenedor de Filtros de Días */
+    .filters-bar {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       margin-bottom: 25px;
     }
 
-    .filter-btn {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+    .btn-filter {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
       padding: 8px 16px;
       border-radius: 20px;
       cursor: pointer;
       font-weight: 600;
+      font-size: 0.9rem;
       transition: all 0.2s ease;
+      color: var(--text-muted);
     }
 
-    .filter-btn:hover, .filter-btn.active {
-      background-color: var(--accent-color);
+    .btn-filter:hover,
+    .btn-filter.active {
+      background: var(--accent);
       color: white;
-      border-color: var(--accent-color);
+      border-color: var(--accent);
     }
 
-    /* Grid de tarjetas de partidos */
+    /* FIX 3: Diseño de Mini Tarjetas */
     .matches-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 15px;
     }
 
-    /* Mini Tarjeta de Partido */
     .match-card {
-      background-color: var(--card-bg);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      padding: 12px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .match-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 6px;
-      font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .category-badge {
+      font-size: 0.75rem;
       font-weight: 700;
-      color: #7f8c8d;
       text-transform: uppercase;
+      color: var(--accent);
+      background-color: rgba(39, 174, 96, 0.1);
+      padding: 3px 8px;
+      border-radius: 4px;
     }
 
     .match-date {
-      font-weight: normal;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
-    /* Filas de Jugadores y Resultados */
+    /* Estructura Paralela de Jugadores y Sets */
     .player-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.95rem;
     }
 
     .player-name {
       font-weight: 600;
-      color: var(--primary-color);
+      font-size: 0.95rem;
+      color: var(--primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 180px;
+      margin-right: 12px;
     }
 
     .sets-container {
       display: flex;
-      gap: 8px;
-      font-weight: bold;
+      gap: 6px;
     }
 
-    .set-score {
-      background-color: #edf2f7;
-      padding: 2px 6px;
+    .set-box {
+      background-color: var(--bg);
       border-radius: 4px;
-      min-width: 16px;
+      min-width: 22px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    .loading {
       text-align: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 40px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- 1. Título de la página -->
+    <!-- 1. Título de la Página -->
     <h1>TORNEO DE TENIS</h1>
 
-    <!-- 2. Filtros de días -->
-    <div id="filterContainer" class="filter-container">
-      <button class="filter-btn active" onclick="filterByDay('all')">Todos</button>
+    <!-- 2. Filtro por Días -->
+    <div id="filterContainer" class="filters-bar">
+      <!-- Se cargarán dinámicamente -->
     </div>
 
-    <!-- 3. Lista de partidos en mini tarjetas -->
+    <!-- 3. Mini Tarjetas de Partidos -->
     <div id="matchesContainer" class="matches-grid">
-      <!-- Las tarjetas se generan dinámicamente aquí -->
+      <div class="loading">Cargando resultados...</div>
     </div>
   </div>
 
   <script>
-    // Ejemplo de estructura de datos proveniente de Google Sheets
-    // Columna 0: Marca temporal (Fecha y hora)
-    // Columna 1: Categoría
-    // Columna 2: Jugador 1
-    // Columna 3: Jugador 2
-    // Columna 4: Sets Jugador 1 (ej: "6 6")
-    // Columna 5: Sets Jugador 2 (ej: "4 2")
-    const rawSheetData = [
-      ["2026-09-18 10:30:00", "Primera", "Juan Pérez", "Carlos Gómez", "6 6", "4 2"],
-      ["2026-09-18 11:45:00", "Segunda", "Lucas Rossi", "Mateo Fernández", "4 6 10", "6 3 8"],
-      ["2026-09-19 09:00:00", "Primera", "Gonzalo López", "Ariel Martínez", "6 7", "3 5"]
-    ];
+    // URL de tu Google Sheet publicado en la web o via API/JSON
+    const SHEET_URL = 'REEMPLAZA_AQUI_TU_URL_DE_GOOGLE_SHEETS';
 
     let allMatches = [];
 
-    // Formatear fecha tomando la Columna 0 (Marca Temporal)
-    function parseRowData(data) {
-      return data.map(row => {
-        const rawTimestamp = row[0]; // Columna 0: Marca temporal
-        const dateObj = new Date(rawTimestamp);
+    // Función para obtener los datos manteniendo la forma previa
+    async function fetchSheetData() {
+      try {
+        const response = await fetch(SHEET_URL);
+        const data = await response.json();
         
-        // Obtener fecha limpia YYYY-MM-DD para filtrado
-        const formattedDay = !isNaN(dateObj) 
-          ? dateObj.toISOString().split('T')[0] 
-          : rawTimestamp.split(' ')[0];
+        // Mapeo utilizando la Columna 0 (Marca temporal)
+        allMatches = processData(data);
+        
+        renderDayFilters();
+        renderMatches(allMatches);
+      } catch (error) {
+        console.error("Error cargando los datos:", error);
+        document.getElementById('matchesContainer').innerHTML = 
+          '<p class="loading">Error al cargar los partidos. Verifica la conexión con Google Sheets.</p>';
+      }
+    }
+
+    // FIX 2: Procesar tomando la Columna [0] (Marca temporal) como referencia
+    function processData(rows) {
+      // Si la primera fila son encabezados, podés hacer rows.slice(1)
+      return rows.map(row => {
+        const timestamp = row[0] || ''; 
+        
+        // Extraer la fecha (YYYY-MM-DD o DD/MM/YYYY) descartando la hora de la Marca Temporal
+        let formattedDate = 'Sin fecha';
+        if (timestamp) {
+          const datePart = timestamp.split(' ')[0]; // Toma la fecha antes del espacio de la hora
+          formattedDate = datePart.trim();
+        }
 
         return {
-          day: formattedDay,
-          category: row[1] || 'General',
-          player1: row[2] || 'Jugador 1',
-          player2: row[3] || 'Jugador 2',
-          p1Sets: (row[4] || '').split(' '),
-          p2Sets: (row[5] || '').split(' ')
+          date: formattedDate,
+          category: row[1] || 'General',      // Columna 1: Categoría
+          player1: row[2] || 'Jugador 1',     // Columna 2: Jugador 1
+          player2: row[3] || 'Jugador 2',     // Columna 3: Jugador 2
+          p1Sets: row[4] ? row[4].toString().split(' ') : [], // Columna 4: Sets J1
+          p2Sets: row[5] ? row[5].toString().split(' ') : []  // Columna 5: Sets J2
         };
       });
     }
 
-    // Inicializar la aplicación
-    function init() {
-      allMatches = parseRowData(rawSheetData);
-      buildDayFilters();
-      renderMatches(allMatches);
-    }
-
-    // Construir los botones de filtro basados en las fechas detectadas en la Columna 0
-    function buildDayFilters() {
+    // FIX 2: Generar botones dinámicos por cada día único detectado en la Columna 0
+    function renderDayFilters() {
       const filterContainer = document.getElementById('filterContainer');
-      const uniqueDays = [...new Set(allMatches.map(m => m.day))].sort();
+      const days = ['Todos', ...new Set(allMatches.map(m => m.date).filter(d => d !== 'Sin fecha'))];
 
-      uniqueDays.forEach(day => {
+      filterContainer.innerHTML = '';
+
+      days.forEach((day, index) => {
         const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.innerText = day;
-        btn.onclick = () => filterByDay(day, btn);
+        btn.className = `btn-filter ${index === 0 ? 'active' : ''}`;
+        btn.textContent = day;
+        btn.onclick = () => filterMatches(day, btn);
         filterContainer.appendChild(btn);
       });
     }
 
-    // Filtrar partidos por el día seleccionado
-    function filterByDay(selectedDay, btnElement) {
-      // Actualizar estado del botón activo
-      const buttons = document.querySelectorAll('.filter-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-      
-      if (btnElement) {
-        btnElement.classList.add('active');
-      } else {
-        buttons[0].classList.add('active');
-      }
+    // Filtrado por día
+    function filterMatches(selectedDay, activeBtn) {
+      document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+      activeBtn.classList.add('active');
 
-      // Filtrar partidos
-      if (selectedDay === 'all') {
+      if (selectedDay === 'Todos') {
         renderMatches(allMatches);
       } else {
-        const filtered = allMatches.filter(m => m.day === selectedDay);
+        const filtered = allMatches.filter(m => m.date === selectedDay);
         renderMatches(filtered);
       }
     }
 
-    // Renderizar tarjetas de partidos
+    // FIX 3: Renderizado en formato de Mini Tarjetas
     function renderMatches(matches) {
       const container = document.getElementById('matchesContainer');
       container.innerHTML = '';
 
       if (matches.length === 0) {
-        container.innerHTML = '<p>No hay partidos registrados para esta fecha.</p>';
+        container.innerHTML = '<p class="loading">No hay partidos para este día.</p>';
         return;
       }
 
@@ -239,26 +259,25 @@
         const card = document.createElement('div');
         card.className = 'match-card';
 
-        // Renderizado de la estructura solicitada
         card.innerHTML = `
           <div class="match-header">
-            <span>${match.category}</span>
-            <span class="match-date">${match.day}</span>
+            <span class="category-badge">${match.category}</span>
+            <span class="match-date">${match.date}</span>
           </div>
-          
-          <!-- Fila Jugador 1 -->
+
+          <!-- Jugador 1 arriba con sus sets al lado -->
           <div class="player-row">
             <span class="player-name">${match.player1}</span>
             <div class="sets-container">
-              ${match.p1Sets.map(score => `<span class="set-score">${score}</span>`).join('')}
+              ${match.p1Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
             </div>
           </div>
 
-          <!-- Fila Jugador 2 (Paralelo Abajo) -->
+          <!-- Jugador 2 en paralelo justo abajo con sus sets al lado -->
           <div class="player-row">
             <span class="player-name">${match.player2}</span>
             <div class="sets-container">
-              ${match.p2Sets.map(score => `<span class="set-score">${score}</span>`).join('')}
+              ${match.p2Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
             </div>
           </div>
         `;
@@ -267,8 +286,8 @@
       });
     }
 
-    // Ejecutar al cargar la página
-    document.addEventListener('DOMContentLoaded', init);
+    // Inicializar carga
+    document.addEventListener('DOMContentLoaded', fetchSheetData);
   </script>
 </body>
 </html>
