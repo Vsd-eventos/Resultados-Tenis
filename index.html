@@ -1,293 +1,573 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- FIX 1: Título de la pestaña -->
-  <title>TORNEO DE TENIS</title>
-  
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --accent: #27ae60;
-      --bg: #f4f6f9;
-      --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --text: #2d3748;
-      --text-muted: #718096;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VSD Eventos - Torneo de Voley</title>
+    <!-- Fuentes de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES Y PALETA DE COLORES IDENTICA --- */
+        :root {
+            --color-negro: #121212;
+            --color-rojo: #e31d2b;
+            --color-rojo-hover: #b8121f;
+            --color-ganador: #1b5e20;
+            --color-ganador-bg: #e8f5e9;
+            --color-ganador-border: #81c784;
+            --color-blanco: #ffffff;
+            --color-gris-fondo: #152241;
+            --color-gris-linea: #e2e8f0;
+            --fuente-principal: 'Oswald', sans-serif;
+            --fuente-secundaria: 'Roboto', sans-serif;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+        body {
+            font-family: var(--fuente-secundaria);
+            background-color: var(--color-gris-fondo);
+            color: var(--color-negro);
+            padding-bottom: 50px;
+        }
 
-    /* FIX 1: Título principal */
-    h1 {
-      text-align: center;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 25px;
-    }
+        /* --- ENCABEZADO CON LOGO DE EVENTO --- */
+        header {
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            padding: 15px 20px;
+            border-bottom: 5px solid var(--color-rojo);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
 
-    /* FIX 2: Contenedor de Filtros de Días */
-    .filters-bar {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 25px;
-    }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-    .btn-filter {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-      color: var(--text-muted);
-    }
+        .logo-cuadrado {
+            background-color: #de020a;
+            color: var(--color-blanco);
+            width: 58px;
+            height: 58px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            font-family: var(--fuente-principal);
+            line-height: 0.95;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
 
-    .btn-filter:hover,
-    .btn-filter.active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
+        .logo-cuadrado .vsd-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-    /* FIX 3: Diseño de Mini Tarjetas */
-    .matches-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 15px;
-    }
+        .logo-cuadrado .eventos-text {
+            font-size: 0.62rem;
+            font-weight: 500;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+            opacity: 0.95;
+        }
 
-    .match-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+        header h1 {
+            font-family: var(--fuente-principal);
+            font-weight: 700;
+            font-size: 2.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            line-height: 1.2;
+        }
 
-    .match-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-    }
+        header h1 span.rojo {
+            color: var(--color-rojo);
+        }
 
-    .category-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--accent);
-      background-color: rgba(39, 174, 96, 0.1);
-      padding: 3px 8px;
-      border-radius: 4px;
-    }
+        /* --- FILTROS DE CATEGORÍA Y DÍA --- */
+        .contenedor-categoria-filtro {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .match-date {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
+        .select-categoria {
+            background-color: #1e1e1e;
+            color: var(--color-blanco);
+            border: 2px solid var(--color-rojo);
+            font-family: var(--fuente-principal);
+            font-size: 1.05rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            outline: none;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
 
-    /* Estructura Paralela de Jugadores y Sets */
-    .player-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        .select-categoria:hover, .select-categoria:focus {
+            background-color: var(--color-rojo);
+            border-color: #ffffff;
+        }
 
-    .player-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-right: 12px;
-    }
+        .select-categoria option {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: var(--fuente-secundaria);
+        }
 
-    .sets-container {
-      display: flex;
-      gap: 6px;
-    }
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
 
-    .set-box {
-      background-color: var(--bg);
-      border-radius: 4px;
-      min-width: 22px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 0.85rem;
-      color: var(--primary);
-    }
+        .filtros-dias {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0 15px;
+            flex-wrap: wrap;
+        }
 
-    .loading {
-      text-align: center;
-      font-weight: 600;
-      color: var(--text-muted);
-      padding: 40px;
-    }
-  </style>
+        .btn-dia {
+            background-color: var(--color-blanco);
+            color: var(--color-negro);
+            border: 2px solid var(--color-negro);
+            font-family: var(--fuente-principal);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-dia:hover, .btn-dia.activo {
+            background-color: var(--color-rojo);
+            color: var(--color-blanco);
+            border-color: var(--color-rojo);
+            box-shadow: 0 4px 10px rgba(227, 29, 43, 0.35);
+        }
+
+        #estado {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #ffffff;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+
+        #estado.oculto { display: none !important; }
+
+        /* --- TARJETAS DINÁMICAS Y RESPONSIVAS --- */
+        .grid-partidos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card-partido {
+            background-color: var(--color-blanco);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            overflow: hidden;
+            border: 1px solid var(--color-gris-linea);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            padding: 10px 15px;
+            font-family: var(--fuente-principal);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--color-rojo);
+        }
+
+        .card-header .categoria-tag {
+            color: var(--color-rojo);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .card-header .dia-tag {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .card-body {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .campo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--color-gris-linea);
+        }
+
+        .campo-row:last-child {
+            border-bottom: none;
+        }
+
+        .campo-label {
+            font-family: var(--fuente-principal);
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #666;
+            font-size: 0.88rem;
+        }
+
+        .campo-valor {
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Estilos Dinámicos de Ganador y Sets */
+        .equipo-ganador {
+            font-weight: 700 !important;
+            color: var(--color-ganador) !important;
+            background-color: var(--color-ganador-bg) !important;
+            border: 2px solid var(--color-ganador-border);
+            border-radius: 8px;
+            padding: 4px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-puntos {
+            display: inline-block;
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            font-family: var(--fuente-principal);
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 6px;
+        }
+
+        .puntos-ganadores {
+            background-color: var(--color-rojo) !important;
+            box-shadow: 0 2px 8px rgba(227, 29, 43, 0.4);
+        }
+
+        .sin-resultados {
+            color: var(--color-blanco);
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px 0;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .header-brand, .contenedor-categoria-filtro, .select-categoria {
+                width: 100%;
+            }
+            header h1 { font-size: 1.4rem; }
+            .grid-partidos {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- 1. Título de la Página -->
-    <h1>TORNEO DE TENIS</h1>
+    <header>
+        <div class="header-brand">
+            <div class="logo-cuadrado">
+                <span class="vsd-text">VSD</span>
+                <span class="eventos-text">eventos</span>
+            </div>
+            <h1>Torneo de <span class="rojo">Voley</span></h1>
+        </div>
 
-    <!-- 2. Filtro por Días -->
-    <div id="filterContainer" class="filters-bar">
-      <!-- Se cargarán dinámicamente -->
+        <div class="contenedor-categoria-filtro">
+            <select id="select-categoria" class="select-categoria" onchange="filtrarPorCategoria(this.value)">
+                <option value="TODAS">🏆 Todas las Categorías</option>
+                <option value="SUB 10 MUJERES">Sub 10 Mujeres</option>
+                <option value="SUB 10 VARONES">Sub 10 Varones</option>
+                <option value="SUB 12 MUJERES">Sub 12 Mujeres</option>
+                <option value="SUB 12 VARONES">Sub 12 Varones</option>
+                <option value="SUB 14 MUJERES">Sub 14 Mujeres</option>
+                <option value="SUB 14 VARONES">Sub 14 Varones</option>
+                <option value="SUB 16 MUJERES">Sub 16 Mujeres</option>
+                <option value="SUB 16 VARONES">Sub 16 Varones</option>
+                <option value="SUB 18 VARONES">Sub 18 Varones</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="filtros-dias">
+            <button class="btn-dia" onclick="filtrarPorDia('VIERNES')">Viernes</button>
+            <button class="btn-dia" onclick="filtrarPorDia('SABADO')">Sábado</button>
+            <button class="btn-dia" onclick="filtrarPorDia('DOMINGO')">Domingo</button>
+            <button class="btn-dia activo" onclick="filtrarPorDia('TODOS')">Todos los Días</button>
+        </div>
+
+        <div id="estado">Cargando resultados...</div>
+
+        <div class="grid-partidos" id="contenedor-tarjetas"></div>
     </div>
 
-    <!-- 3. Mini Tarjetas de Partidos -->
-    <div id="matchesContainer" class="matches-grid">
-      <div class="loading">Cargando resultados...</div>
-    </div>
-  </div>
+    <script>
+        // URL de tu Web App de Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4BTFPZCMQH78G4lzflQDK0Rqj7JIVR_fqxMSaBlLt2GKWD0iD8po0WUYdW9iRiWcn/exec'; 
+        const TIEMPO_REFRESCO_MS = 20000;
 
-  <script>
-    // URL de tu Google Sheet publicado en la web o via API/JSON
-    const SHEET_URL = 'REEMPLAZA_AQUI_TU_URL_DE_GOOGLE_SHEETS';
+        let todosLosDatos = [];
+        let diaSeleccionado = 'TODOS';
+        let categoriaSeleccionada = 'TODAS';
 
-    let allMatches = [];
-
-    // Función para obtener los datos manteniendo la forma previa
-    async function fetchSheetData() {
-      try {
-        const response = await fetch(SHEET_URL);
-        const data = await response.json();
-        
-        // Mapeo utilizando la Columna 0 (Marca temporal)
-        allMatches = processData(data);
-        
-        renderDayFilters();
-        renderMatches(allMatches);
-      } catch (error) {
-        console.error("Error cargando los datos:", error);
-        document.getElementById('matchesContainer').innerHTML = 
-          '<p class="loading">Error al cargar los partidos. Verifica la conexión con Google Sheets.</p>';
-      }
-    }
-
-    // FIX 2: Procesar tomando la Columna [0] (Marca temporal) como referencia
-    function processData(rows) {
-      // Si la primera fila son encabezados, podés hacer rows.slice(1)
-      return rows.map(row => {
-        const timestamp = row[0] || ''; 
-        
-        // Extraer la fecha (YYYY-MM-DD o DD/MM/YYYY) descartando la hora de la Marca Temporal
-        let formattedDate = 'Sin fecha';
-        if (timestamp) {
-          const datePart = timestamp.split(' ')[0]; // Toma la fecha antes del espacio de la hora
-          formattedDate = datePart.trim();
+        function normalizarTexto(txt) {
+            if (!txt) return "";
+            return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
-        return {
-          date: formattedDate,
-          category: row[1] || 'General',      // Columna 1: Categoría
-          player1: row[2] || 'Jugador 1',     // Columna 2: Jugador 1
-          player2: row[3] || 'Jugador 2',     // Columna 3: Jugador 2
-          p1Sets: row[4] ? row[4].toString().split(' ') : [], // Columna 4: Sets J1
-          p2Sets: row[5] ? row[5].toString().split(' ') : []  // Columna 5: Sets J2
-        };
-      });
-    }
+        async function cargarDatos() {
+            const datosCache = localStorage.getItem('vsd_resultados_cache');
+            if (datosCache && todosLosDatos.length === 0) {
+                try {
+                    todosLosDatos = JSON.parse(datosCache);
+                    renderizarTarjetas();
+                    document.getElementById('estado').classList.add('oculto');
+                } catch (e) {
+                    console.error("Error leyendo caché", e);
+                }
+            }
 
-    // FIX 2: Generar botones dinámicos por cada día único detectado en la Columna 0
-    function renderDayFilters() {
-      const filterContainer = document.getElementById('filterContainer');
-      const days = ['Todos', ...new Set(allMatches.map(m => m.date).filter(d => d !== 'Sin fecha'))];
+            try {
+                const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error('Error de conexión');
 
-      filterContainer.innerHTML = '';
+                const datos = await response.json();
+                if (datos && Array.isArray(datos) && datos.length > 0) {
+                    todosLosDatos = datos;
+                    localStorage.setItem('vsd_resultados_cache', JSON.stringify(datos));
+                    renderizarTarjetas();
+                }
+                document.getElementById('estado').classList.add('oculto');
+            } catch (error) {
+                console.warn('Usando datos locales por lentitud en la red.', error);
+                document.getElementById('estado').classList.add('oculto');
+            }
+        }
 
-      days.forEach((day, index) => {
-        const btn = document.createElement('button');
-        btn.className = `btn-filter ${index === 0 ? 'active' : ''}`;
-        btn.textContent = day;
-        btn.onclick = () => filterMatches(day, btn);
-        filterContainer.appendChild(btn);
-      });
-    }
+        function filtrarPorDia(dia) {
+            diaSeleccionado = normalizarTexto(dia);
+            document.querySelectorAll('.btn-dia').forEach(btn => {
+                const btnTexto = normalizarTexto(btn.textContent);
+                if (btnTexto.includes(diaSeleccionado) || (diaSeleccionado === 'SABADO' && btnTexto.includes('SABADO'))) {
+                    btn.classList.add('activo');
+                } else {
+                    btn.classList.remove('activo');
+                }
+            });
+            renderizarTarjetas();
+        }
 
-    // Filtrado por día
-    function filterMatches(selectedDay, activeBtn) {
-      document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
-      activeBtn.classList.add('active');
+        function filtrarPorCategoria(cat) {
+            categoriaSeleccionada = cat;
+            renderizarTarjetas();
+        }
 
-      if (selectedDay === 'Todos') {
-        renderMatches(allMatches);
-      } else {
-        const filtered = allMatches.filter(m => m.date === selectedDay);
-        renderMatches(filtered);
-      }
-    }
+        function parsearFechaLatino(fechaStr) {
+            if (!fechaStr) return null;
+            const str = String(fechaStr).trim();
+            const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+            if (match) {
+                const dia = parseInt(match[1], 10);
+                const mes = parseInt(match[2], 10) - 1; 
+                let anio = parseInt(match[3], 10);
+                if (anio < 100) anio += 2000;
+                const f = new Date(anio, mes, dia);
+                if (!isNaN(f.getTime())) return f;
+            }
+            return null;
+        }
 
-    // FIX 3: Renderizado en formato de Mini Tarjetas
-    function renderMatches(matches) {
-      const container = document.getElementById('matchesContainer');
-      container.innerHTML = '';
+        function renderizarTarjetas() {
+            const contenedor = document.getElementById('contenedor-tarjetas');
+            if (!contenedor || todosLosDatos.length === 0) return;
 
-      if (matches.length === 0) {
-        container.innerHTML = '<p class="loading">No hay partidos para este día.</p>';
-        return;
-      }
+            const keys = Object.keys(todosLosDatos[0]);
+            const keyMarcaTemporal = keys.find(k => normalizarTexto(k).includes("MARCA") || normalizarTexto(k).includes("TEMPORAL")) || keys[0];
+            const keyCategoria = keys.find(k => normalizarTexto(k).includes("CATEGORIA"));
 
-      matches.forEach(match => {
-        const card = document.createElement('div');
-        card.className = 'match-card';
+            const encabezadosVisibles = keys.filter(k => {
+                const norm = normalizarTexto(k);
+                return k !== keyMarcaTemporal && !norm.includes("MARCA") && !norm.includes("RESULTADO FINAL");
+            });
 
-        card.innerHTML = `
-          <div class="match-header">
-            <span class="category-badge">${match.category}</span>
-            <span class="match-date">${match.date}</span>
-          </div>
+            const diaBusqueda = normalizarTexto(diaSeleccionado);
+            const catBusqueda = normalizarTexto(categoriaSeleccionada);
 
-          <!-- Jugador 1 arriba con sus sets al lado -->
-          <div class="player-row">
-            <span class="player-name">${match.player1}</span>
-            <div class="sets-container">
-              ${match.p1Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
-            </div>
-          </div>
+            const datosFiltrados = todosLosDatos.filter(fila => {
+                if (catBusqueda !== 'TODAS' && keyCategoria) {
+                    if (!normalizarTexto(fila[keyCategoria]).includes(catBusqueda)) return false;
+                }
+                
+                if (diaBusqueda === 'TODOS') return true;
 
-          <!-- Jugador 2 en paralelo justo abajo con sus sets al lado -->
-          <div class="player-row">
-            <span class="player-name">${match.player2}</span>
-            <div class="sets-container">
-              ${match.p2Sets.map(s => `<span class="set-box">${s}</span>`).join('')}
-            </div>
-          </div>
-        `;
+                const valorMarca = fila[keyMarcaTemporal];
+                if (!valorMarca) return false;
 
-        container.appendChild(card);
-      });
-    }
+                const txtNorm = normalizarTexto(valorMarca);
+                if (diaBusqueda === "VIERNES" && (txtNorm.includes("VIERNES") || txtNorm.includes("VIE"))) return true;
+                if (diaBusqueda === "SABADO" && (txtNorm.includes("SABADO") || txtNorm.includes("SAB"))) return true;
+                if (diaBusqueda === "DOMINGO" && (txtNorm.includes("DOMINGO") || txtNorm.includes("DOM"))) return true;
 
-    // Inicializar carga
-    document.addEventListener('DOMContentLoaded', fetchSheetData);
-  </script>
+                const fecha = parsearFechaLatino(valorMarca);
+                if (fecha) {
+                    const numDia = fecha.getDay(); 
+                    if (diaBusqueda === 'VIERNES' && numDia === 5) return true;
+                    if (diaBusqueda === 'SABADO' && numDia === 6) return true;
+                    if (diaBusqueda === 'DOMINGO' && numDia === 0) return true;
+                }
+
+                return false;
+            });
+
+            if (datosFiltrados.length === 0) {
+                contenedor.innerHTML = `<div class="sin-resultados">No hay partidos cargados para los filtros seleccionados.</div>`;
+                return;
+            }
+
+            let HTMLTarjetas = '';
+
+            datosFiltrados.forEach(fila => {
+                const analisisGanador = obtenerGanadorPorSets(fila, encabezadosVisibles);
+                const catTexto = keyCategoria && fila[keyCategoria] ? fila[keyCategoria] : "PARTIDO";
+                const marcaTexto = fila[keyMarcaTemporal] ? String(fila[keyMarcaTemporal]) : "";
+
+                let camposHTML = '';
+
+                encabezadosVisibles.forEach(header => {
+                    let valor = (fila[header] !== undefined && fila[header] !== null && fila[header] !== "") ? fila[header] : "-";
+                    const headerUpper = normalizarTexto(header);
+                    const esSets = headerUpper.includes('SET') || headerUpper.includes('PUNTOS') || headerUpper.includes('SCORE');
+
+                    let contenidoValor = valor;
+
+                    if (analisisGanador.ganadorHeader && analisisGanador.ganadorHeader === header && valor !== "-") {
+                        contenidoValor = `<span class="equipo-ganador">🏆 ${valor}</span>`;
+                    } 
+                    else if (analisisGanador.setsGanadorHeader && header === analisisGanador.setsGanadorHeader && valor !== "-") {
+                        contenidoValor = `<span class="badge-puntos puntos-ganadores">${valor}</span>`;
+                    } 
+                    else if (esSets && valor !== "-") {
+                        contenidoValor = `<span class="badge-puntos">${valor}</span>`;
+                    }
+
+                    camposHTML += `
+                        <div class="campo-row">
+                            <span class="campo-label">${header}</span>
+                            <span class="campo-valor">${contenidoValor}</span>
+                        </div>
+                    `;
+                });
+
+                HTMLTarjetas += `
+                    <div class="card-partido">
+                        <div class="card-header">
+                            <span class="categoria-tag">${catTexto}</span>
+                            <span class="dia-tag">${marcaTexto}</span>
+                        </div>
+                        <div class="card-body">
+                            ${camposHTML}
+                        </div>
+                    </div>
+                `;
+            });
+
+            contenedor.innerHTML = HTMLTarjetas;
+        }
+
+        function obtenerGanadorPorSets(fila, encabezados) {
+            let eq1Header = null, sets1 = 0, sets1Header = null;
+            let eq2Header = null, sets2 = 0, sets2Header = null;
+
+            encabezados.forEach(h => {
+                const name = normalizarTexto(h);
+                if (name.includes('EQUIPO 1') || name.includes('CLUB 1') || name.includes('LOCAL') || name.includes('JUGADOR 1')) {
+                    if (name.includes('SETS GANADOS') || name.includes('SETS') || name.includes('TOTAL SETS')) {
+                        sets1 = parseInt(fila[h], 10);
+                        sets1Header = h;
+                    } else if (!name.includes('SET')) {
+                        eq1Header = h;
+                    }
+                } else if (name.includes('EQUIPO 2') || name.includes('CLUB 2') || name.includes('VISITANTE') || name.includes('JUGADOR 2')) {
+                    if (name.includes('SETS GANADOS') || name.includes('SETS') || name.includes('TOTAL SETS')) {
+                        sets2 = parseInt(fila[h], 10);
+                        sets2Header = h;
+                    } else if (!name.includes('SET')) {
+                        eq2Header = h;
+                    }
+                }
+            });
+
+            if (isNaN(sets1) || isNaN(sets2) || (sets1 === 0 && sets2 === 0)) {
+                sets1 = 0; sets2 = 0;
+                encabezados.forEach(h => {
+                    const name = normalizarTexto(h);
+                    if (name.includes('SET') && !name.includes('GANADOS')) {
+                        const val = fila[h];
+                        if (val && String(val).includes('-')) {
+                            const partes = String(val).split('-');
+                            const pts1 = parseInt(partes[0], 10);
+                            const pts2 = parseInt(partes[1], 10);
+                            if (!isNaN(pts1) && !isNaN(pts2)) {
+                                if (pts1 > pts2) sets1++;
+                                else if (pts2 > pts1) sets2++;
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (!isNaN(sets1) && !isNaN(sets2)) {
+                if (sets1 > sets2) return { ganadorHeader: eq1Header, setsGanadorHeader: sets1Header };
+                if (sets2 > sets1) return { ganadorHeader: eq2Header, setsGanadorHeader: sets2Header };
+            }
+
+            return { ganadorHeader: null, setsGanadorHeader: null };
+        }
+
+        cargarDatos();
+        setInterval(cargarDatos, TIEMPO_REFRESCO_MS);
+    </script>
 </body>
 </html>
