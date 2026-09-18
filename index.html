@@ -294,58 +294,48 @@
             return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
-        function obtenerValorPorIndice(valores, indice) {
-            if (valores && valores[indice] !== undefined && valores[indice] !== null) {
-                const v = String(valores[indice]).trim();
-                return v !== "" ? v : "-";
+        // Obtiene el valor de una clave de forma flexible
+        function obtenerValorCamp(fila, listaPosiblesNombres) {
+            const keys = Object.keys(fila);
+            for (let nombre of listaPosiblesNombres) {
+                const keyEncontrada = keys.find(k => normalizarTexto(k).replace(/[^A-Z0-9]/g, "").includes(normalizarTexto(nombre).replace(/[^A-Z0-9]/g, "")));
+                if (keyEncontrada && fila[keyEncontrada] !== undefined && fila[keyEncontrada] !== null) {
+                    const val = String(fila[keyEncontrada]).trim();
+                    if (val !== "") return val;
+                }
             }
             return "-";
         }
 
         function procesarPartido(fila) {
-            // Convierte el objeto fila en un arreglo ordenado de sus valores
-            const valores = Array.isArray(fila) ? fila : Object.values(fila);
-            const keys = Object.keys(fila);
+            // Nombre de Categoría
+            const category = obtenerValorCamp(fila, ["CATEGORIA", "CAT"]) || "CATEGORÍA";
 
-            let category = "CATEGORÍA";
-            let player1 = "Jugador 1";
-            let player2 = "Jugador 2";
-            let dateRaw = "";
+            // Nombre Jugadores
+            const player1 = obtenerValorCamp(fila, ["JUGADOR 1", "EQUIPO 1", "J1", "LOCAL"]);
+            const player2 = obtenerValorCamp(fila, ["JUGADOR 2", "EQUIPO 2", "J2", "VISITANTE"]);
 
-            // Intenta leer Jugador 1, Jugador 2, Categoría y Fecha por nombre o posición inicial
-            keys.forEach((key, idx) => {
-                const kNorm = normalizarTexto(key);
-                const val = fila[key] !== undefined && fila[key] !== null ? String(fila[key]).trim() : "";
+            // Fecha / Día
+            const dateRaw = obtenerValorCamp(fila, ["FECHA", "DIA", "MARCA TEMPORAL"]);
 
-                if (kNorm.includes("CATEGORIA")) category = val || category;
-                else if (kNorm.includes("J1") || (kNorm.includes("JUGADOR 1") && !kNorm.includes("SET"))) player1 = val || player1;
-                else if (kNorm.includes("J2") || (kNorm.includes("JUGADOR 2") && !kNorm.includes("SET"))) player2 = val || player2;
-                else if (kNorm.includes("MARCA") || kNorm.includes("FECHA")) dateRaw = val || dateRaw;
-            });
-
-            // Mapeo según la posición exacta de las columnas indicadas:
-            // Columna 4 (índice 3): Set 1 J1
-            // Columna 5 (índice 4): Set 1 J2
-            // Columna 6 (índice 5): Set 2 J1
-            // Columna 7 (índice 6): Set 2 J2
-            // Columna 8 (índice 7): Set 3 J1
-            // Columna 9 (índice 8): Set 3 J2
+            // Sets Jugador 1
             const p1Sets = [
-                obtenerValorPorIndice(valores, 3), // Columna 4
-                obtenerValorPorIndice(valores, 5), // Columna 6
-                obtenerValorPorIndice(valores, 7)  // Columna 8
+                obtenerValorCamp(fila, ["SET1_J1", "SET 1 J1", "SET1 J1", "SET1J1", "S1J1"]),
+                obtenerValorCamp(fila, ["SET2_J1", "SET 2 J1", "SET2 J1", "SET2J1", "S2J1"]),
+                obtenerValorCamp(fila, ["SET3_J1", "SET 3 J1", "SET3 J1", "SET3J1", "S3J1"])
             ];
 
+            // Sets Jugador 2
             const p2Sets = [
-                obtenerValorPorIndice(valores, 4), // Columna 5
-                obtenerValorPorIndice(valores, 6), // Columna 7
-                obtenerValorPorIndice(valores, 8)  // Columna 9
+                obtenerValorCamp(fila, ["SET1_J2", "SET 1 J2", "SET1 J2", "SET1J2", "S1J2"]),
+                obtenerValorCamp(fila, ["SET2_J2", "SET 2 J2", "SET2 J2", "SET2J2", "S2J2"]),
+                obtenerValorCamp(fila, ["SET3_J2", "SET 3 J2", "SET3 J2", "SET3J2", "S3J2"])
             ];
 
             return {
                 category,
-                player1,
-                player2,
+                player1: player1 !== "-" ? player1 : "Jugador 1",
+                player2: player2 !== "-" ? player2 : "Jugador 2",
                 dateRaw,
                 p1Sets,
                 p2Sets
@@ -364,6 +354,7 @@
                 }
             } catch (error) {
                 console.warn('Error al actualizar datos:', error);
+                document.getElementById('matchesContainer').innerHTML = '<p class="loading">Error al cargar datos. Verifica la URL del App Script.</p>';
             }
         }
 
@@ -409,7 +400,7 @@
                         <span class="category-badge">${match.category}</span>
                     </div>
 
-                    <!-- Jugador 1 -->
+                    <!-- Jugador 1 (J1) -->
                     <div class="player-row">
                         <span class="player-name">${match.player1}</span>
                         <div class="sets-container">
@@ -417,7 +408,7 @@
                         </div>
                     </div>
 
-                    <!-- Jugador 2 -->
+                    <!-- Jugador 2 (J2) -->
                     <div class="player-row">
                         <span class="player-name">${match.player2}</span>
                         <div class="sets-container">
