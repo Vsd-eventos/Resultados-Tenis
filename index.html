@@ -294,15 +294,25 @@
             return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
-        // Búsqueda ultratolerante de columnas de Sets por Jugador
-        function obtenerValorSet(fila, numSet, jugador) {
+        // Busca una clave de la fila que contenga la subcadena indicada
+        function obtenerValorPorClave(fila, patron) {
             const keys = Object.keys(fila);
-            // Busca claves tipo "SET1_J1", "SET 1 J1", "SET1 J1", "SET 1 (J1)" etc.
+            const keyMatch = keys.find(k => normalizarTexto(k).includes(normalizarTexto(patron)));
+            if (keyMatch && fila[keyMatch] !== undefined && fila[keyMatch] !== null) {
+                const val = String(fila[keyMatch]).trim();
+                return val !== "" ? val : null;
+            }
+            return null;
+        }
+
+        // Obtiene el valor del set buscando coincidencia de SET y J1 / J2
+        function obtenerSetJugador(fila, numSet, jugador) {
+            const keys = Object.keys(fila);
             const keyMatch = keys.find(k => {
                 const kn = normalizarTexto(k);
-                const tieneSetNum = kn.includes(`SET${numSet}`) || kn.includes(`SET ${numSet}`) || kn.includes(`S${numSet}`);
-                const tieneJugador = kn.includes(`J${jugador}`) || kn.includes(`JUGADOR ${jugador}`) || kn.includes(`EQUIPO ${jugador}`);
-                return tieneSetNum && tieneJugador;
+                const tieneSet = kn.includes(`SET${numSet}`) || kn.includes(`SET ${numSet}`) || kn.includes(`S${numSet}`);
+                const tieneJugador = kn.includes(`J${jugador}`);
+                return tieneSet && tieneJugador;
             });
 
             if (keyMatch && fila[keyMatch] !== undefined && fila[keyMatch] !== null) {
@@ -320,36 +330,42 @@
             let player2 = "Jugador 2";
             let dateRaw = "";
 
+            // Categoría
+            const catVal = obtenerValorPorClave(fila, "CATEGORIA");
+            if (catVal) category = catVal;
+
+            // Fecha / Marca temporal
+            const fechaVal = obtenerValorPorClave(fila, "FECHA") || obtenerValorPorClave(fila, "MARCA") || obtenerValorPorClave(fila, "TEMPORAL");
+            if (fechaVal) dateRaw = fechaVal;
+
+            // Detección estricta de Jugador 1 y Jugador 2 basados en "J1" y "J2"
             keys.forEach(key => {
                 const kNorm = normalizarTexto(key);
                 const val = fila[key] !== undefined && fila[key] !== null ? String(fila[key]).trim() : "";
 
-                if (kNorm.includes("CATEGORIA")) {
-                    if (val) category = val;
+                if (!val) return;
+
+                // Es Jugador 1 si dice J1 pero NO es una columna de SET
+                if (kNorm.includes("J1") && !kNorm.includes("SET") && !kNorm.includes("S1") && !kNorm.includes("S2") && !kNorm.includes("S3")) {
+                    player1 = val;
                 }
-                else if ((kNorm.includes("JUGADOR 1") || kNorm.includes("EQUIPO 1") || kNorm.includes("LOCAL")) && !kNorm.includes("SET")) {
-                    if (val) player1 = val;
-                }
-                else if ((kNorm.includes("JUGADOR 2") || kNorm.includes("EQUIPO 2") || kNorm.includes("VISITANTE")) && !kNorm.includes("SET")) {
-                    if (val) player2 = val;
-                }
-                else if (kNorm.includes("MARCA") || kNorm.includes("TEMPORAL") || kNorm.includes("FECHA")) {
-                    if (val) dateRaw = val;
+                // Es Jugador 2 si dice J2 pero NO es una columna de SET
+                else if (kNorm.includes("J2") && !kNorm.includes("SET") && !kNorm.includes("S1") && !kNorm.includes("S2") && !kNorm.includes("S3")) {
+                    player2 = val;
                 }
             });
 
-            // Extrae Sets para Jugador 1 (Set1_J1, Set2_J1, Set3_J1)
+            // Extrae Sets para J1 y J2 (Set1, Set2, Set3)
             const p1Sets = [
-                obtenerValorSet(fila, 1, 1),
-                obtenerValorSet(fila, 2, 1),
-                obtenerValorSet(fila, 3, 1)
+                obtenerSetJugador(fila, 1, 1),
+                obtenerSetJugador(fila, 2, 1),
+                obtenerSetJugador(fila, 3, 1)
             ];
 
-            // Extrae Sets para Jugador 2 (Set1_J2, Set2_J2, Set3_J2)
             const p2Sets = [
-                obtenerValorSet(fila, 1, 2),
-                obtenerValorSet(fila, 2, 2),
-                obtenerValorSet(fila, 3, 2)
+                obtenerSetJugador(fila, 1, 2),
+                obtenerSetJugador(fila, 2, 2),
+                obtenerSetJugador(fila, 3, 2)
             ];
 
             return {
@@ -419,7 +435,7 @@
                         <span class="category-badge">${match.category}</span>
                     </div>
 
-                    <!-- Jugador 1 arriba con sus sets al lado -->
+                    <!-- Jugador 1 (J1) -->
                     <div class="player-row">
                         <span class="player-name">${match.player1}</span>
                         <div class="sets-container">
@@ -427,7 +443,7 @@
                         </div>
                     </div>
 
-                    <!-- Jugador 2 abajo con sus sets al lado -->
+                    <!-- Jugador 2 (J2) -->
                     <div class="player-row">
                         <span class="player-name">${match.player2}</span>
                         <div class="sets-container">
