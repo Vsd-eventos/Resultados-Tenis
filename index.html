@@ -167,7 +167,7 @@
             font-size: 1.1rem;
         }
 
-        /* --- ESTILOS DE TUS MINI TARJETAS --- */
+        /* --- FORMATO DE MINI TARJETAS --- */
         #matchesContainer {
             display: flex;
             flex-direction: column;
@@ -294,7 +294,18 @@
             return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
-        // Convierte las filas crudas del Sheet al objeto estructurado que usa tu renderMatches
+        // Obtiene el valor de una clave sin importar diferencias en mayúsculas/minúsculas/espacios
+        function obtenerValorColumna(fila, patronBusqueda) {
+            const keys = Object.keys(fila);
+            const keyEncontrada = keys.find(k => normalizarTexto(k).replace(/[\s_]/g, "").includes(normalizarTexto(patronBusqueda).replace(/[\s_]/g, "")));
+            if (keyEncontrada && fila[keyEncontrada] !== undefined && fila[keyEncontrada] !== null) {
+                const val = String(fila[keyEncontrada]).trim();
+                return val !== "" ? val : "-";
+            }
+            return "-";
+        }
+
+        // Mapea la fila del Google Sheet con las columnas específicas: Set1_J1, Set2_J1, Set3_J1, Set1_J2, Set2_J2, Set3_J2
         function procesarPartido(fila) {
             const keys = Object.keys(fila);
 
@@ -302,9 +313,6 @@
             let player1 = "Jugador 1";
             let player2 = "Jugador 2";
             let dateRaw = "";
-
-            let p1Sets = [];
-            let p2Sets = [];
 
             keys.forEach(key => {
                 const kNorm = normalizarTexto(key);
@@ -322,22 +330,20 @@
                 else if (kNorm.includes("MARCA") || kNorm.includes("TEMPORAL") || kNorm.includes("FECHA")) {
                     if (val) dateRaw = val;
                 }
-                // Sets
-                else if (kNorm.includes("SET")) {
-                    const matchGion = val.match(/^(\d+)\s*[\-\:]\s*(\d+)$/);
-                    if (matchGion) {
-                        p1Sets.push(matchGion[1]);
-                        p2Sets.push(matchGion[2]);
-                    } else if (val !== "") {
-                        p1Sets.push(val);
-                        p2Sets.push("-");
-                    }
-                }
             });
 
-            // Si no vinieron sets, coloca guión por defecto
-            if (p1Sets.length === 0) p1Sets = ["-"];
-            if (p2Sets.length === 0) p2Sets = ["-"];
+            // Mapeo directo de las columnas específicas solicitadas
+            const p1Sets = [
+                obtenerValorColumna(fila, "Set1_J1"),
+                obtenerValorColumna(fila, "Set2_J1"),
+                obtenerValorColumna(fila, "Set3_J1")
+            ];
+
+            const p2Sets = [
+                obtenerValorColumna(fila, "Set1_J2"),
+                obtenerValorColumna(fila, "Set2_J2"),
+                obtenerValorColumna(fila, "Set3_J2")
+            ];
 
             return {
                 category,
@@ -349,7 +355,6 @@
             };
         }
 
-        // Carga de datos desde Google Sheets
         async function cargarDatos() {
             try {
                 const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
@@ -389,7 +394,7 @@
             renderMatches(partidosFiltrados);
         }
 
-        // FIX 3: Renderizado en formato de Mini Tarjetas (Sin fecha)
+        // Renderizado en formato Mini Tarjetas (sin fecha y sin total de sets)
         function renderMatches(matches) {
             const container = document.getElementById('matchesContainer');
             container.innerHTML = '';
