@@ -167,7 +167,7 @@
             font-size: 1.1rem;
         }
 
-        /* --- FORMATO DE MINI TARJETAS --- */
+        /* --- FORMATO MINI TARJETAS --- */
         #matchesContainer {
             display: flex;
             flex-direction: column;
@@ -294,18 +294,24 @@
             return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
-        // Obtiene el valor de una clave sin importar diferencias en mayúsculas/minúsculas/espacios
-        function obtenerValorColumna(fila, patronBusqueda) {
+        // Búsqueda ultratolerante de columnas de Sets por Jugador
+        function obtenerValorSet(fila, numSet, jugador) {
             const keys = Object.keys(fila);
-            const keyEncontrada = keys.find(k => normalizarTexto(k).replace(/[\s_]/g, "").includes(normalizarTexto(patronBusqueda).replace(/[\s_]/g, "")));
-            if (keyEncontrada && fila[keyEncontrada] !== undefined && fila[keyEncontrada] !== null) {
-                const val = String(fila[keyEncontrada]).trim();
+            // Busca claves tipo "SET1_J1", "SET 1 J1", "SET1 J1", "SET 1 (J1)" etc.
+            const keyMatch = keys.find(k => {
+                const kn = normalizarTexto(k);
+                const tieneSetNum = kn.includes(`SET${numSet}`) || kn.includes(`SET ${numSet}`) || kn.includes(`S${numSet}`);
+                const tieneJugador = kn.includes(`J${jugador}`) || kn.includes(`JUGADOR ${jugador}`) || kn.includes(`EQUIPO ${jugador}`);
+                return tieneSetNum && tieneJugador;
+            });
+
+            if (keyMatch && fila[keyMatch] !== undefined && fila[keyMatch] !== null) {
+                const val = String(fila[keyMatch]).trim();
                 return val !== "" ? val : "-";
             }
             return "-";
         }
 
-        // Mapea la fila del Google Sheet con las columnas específicas: Set1_J1, Set2_J1, Set3_J1, Set1_J2, Set2_J2, Set3_J2
         function procesarPartido(fila) {
             const keys = Object.keys(fila);
 
@@ -332,17 +338,18 @@
                 }
             });
 
-            // Mapeo directo de las columnas específicas solicitadas
+            // Extrae Sets para Jugador 1 (Set1_J1, Set2_J1, Set3_J1)
             const p1Sets = [
-                obtenerValorColumna(fila, "Set1_J1"),
-                obtenerValorColumna(fila, "Set2_J1"),
-                obtenerValorColumna(fila, "Set3_J1")
+                obtenerValorSet(fila, 1, 1),
+                obtenerValorSet(fila, 2, 1),
+                obtenerValorSet(fila, 3, 1)
             ];
 
+            // Extrae Sets para Jugador 2 (Set1_J2, Set2_J2, Set3_J2)
             const p2Sets = [
-                obtenerValorColumna(fila, "Set1_J2"),
-                obtenerValorColumna(fila, "Set2_J2"),
-                obtenerValorColumna(fila, "Set3_J2")
+                obtenerValorSet(fila, 1, 2),
+                obtenerValorSet(fila, 2, 2),
+                obtenerValorSet(fila, 3, 2)
             ];
 
             return {
@@ -388,13 +395,12 @@
                 if (diaBusqueda === "SABADO" && (fechaNorm.includes("SABADO") || fechaNorm.includes("SAB"))) return true;
                 if (diaBusqueda === "DOMINGO" && (fechaNorm.includes("DOMINGO") || fechaNorm.includes("DOM"))) return true;
 
-                return false;
+                return true; 
             });
 
             renderMatches(partidosFiltrados);
         }
 
-        // Renderizado en formato Mini Tarjetas (sin fecha y sin total de sets)
         function renderMatches(matches) {
             const container = document.getElementById('matchesContainer');
             container.innerHTML = '';
@@ -421,7 +427,7 @@
                         </div>
                     </div>
 
-                    <!-- Jugador 2 en paralelo justo abajo con sus sets al lado -->
+                    <!-- Jugador 2 abajo con sus sets al lado -->
                     <div class="player-row">
                         <span class="player-name">${match.player2}</span>
                         <div class="sets-container">
