@@ -146,6 +146,7 @@
             font-size: 1.1rem;
         }
 
+        /* --- ESTILOS DE LA TARJETA CORREGIDA --- */
         #matchesContainer {
             display: flex;
             flex-direction: column;
@@ -158,18 +159,23 @@
             border-radius: 10px;
             padding: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            border-left: 5px solid var(--color-rojo);
+            border-left: 6px solid var(--color-rojo);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .match-header {
+            margin-bottom: 4px;
         }
 
         .category-badge {
             font-family: var(--fuente-principal);
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             color: var(--color-rojo);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .player-row {
@@ -184,6 +190,7 @@
         .player-name {
             font-weight: 600;
             font-size: 1rem;
+            color: var(--color-negro);
         }
 
         .sets-container {
@@ -193,10 +200,12 @@
 
         .set-box {
             background-color: #e2e8f0;
+            color: #121212;
             font-family: var(--fuente-principal);
             font-weight: 700;
+            font-size: 1rem;
             min-width: 32px;
-            height: 28px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -234,19 +243,18 @@
         </div>
 
         <div id="matchesContainer">
-            <p class="loading">Cargando partidos desde Google Sheets...</p>
+            <p class="loading">Cargando partidos...</p>
         </div>
     </div>
 
     <script>
-        // REEMPLAZA ESTA URL CON EL ENLACE CSV DE "PUBLICAR EN LA WEB"
+        // PEGA AQUÍ LA URL DE TU CSV PUBLICADO EN LA WEB
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vREEMPLAZA_ESTO_CON_TU_URL_CSV/pub?output=csv';
         
         let rawSheetData = [];
         let diaSeleccionado = 'TODOS';
         let categoriaSeleccionada = 'TODAS';
 
-        // Convierte el texto CSV a un Array de objetos de JavaScript
         function parseCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
             if (lines.length === 0) return [];
@@ -270,7 +278,7 @@
         async function cargarDatos() {
             try {
                 const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
-                if (!response.ok) throw new Error('No se pudo acceder al enlace CSV');
+                if (!response.ok) throw new Error('No se pudo acceder al CSV');
 
                 const csvText = await response.text();
                 rawSheetData = parseCSV(csvText);
@@ -279,7 +287,7 @@
                 console.error('Error al cargar datos:', error);
                 document.getElementById('matchesContainer').innerHTML = `
                     <p class="loading" style="color: #ff6b6b;">
-                        Error al cargar datos.<br>Asegúrate de haber publicado la hoja como CSV y reemplazado la URL.
+                        Error al cargar datos. Verifica el enlace CSV de tu hoja de cálculo.
                     </p>`;
             }
         }
@@ -291,12 +299,10 @@
             const filtrados = rawSheetData.filter(fila => {
                 const textoFila = JSON.stringify(fila).toUpperCase();
 
-                // Filtro por día
                 if (diaSeleccionado !== 'TODOS') {
                     if (!textoFila.includes(diaSeleccionado)) return false;
                 }
 
-                // Filtro por categoría
                 if (categoriaSeleccionada !== 'TODAS') {
                     if (!textoFila.includes(categoriaSeleccionada)) return false;
                 }
@@ -305,32 +311,38 @@
             });
 
             if (filtrados.length === 0) {
-                container.innerHTML = '<p class="loading">No hay partidos registrados para esta selección.</p>';
+                container.innerHTML = '<p class="loading">No hay partidos para los filtros seleccionados.</p>';
                 return;
             }
 
             filtrados.forEach(fila => {
-                const keys = Object.keys(fila);
                 const values = Object.values(fila);
 
-                // Asignación flexible de columnas según la fila
-                const cat = values[0] || 'CATEGORÍA';
-                const j1 = values[1] || 'Jugador 1';
-                const j2 = values[2] || 'Jugador 2';
+                // Asignación explícita de campos según la columna del Google Sheet
+                // Columna 0: Marca Temporal/Día | Columna 1: Categoría | Columna 2: Jugador 1 | Columna 3: Jugador 2
+                let category = values[1] || 'CATEGORÍA';
+                let j1 = values[2] || 'Jugador 1';
+                let j2 = values[3] || 'Jugador 2';
 
-                // Búsqueda de sets
-                const s1_j1 = values[3] || '-';
-                const s2_j1 = values[4] || '-';
-                const s3_j1 = values[5] || '-';
+                // Sets de Jugador 1
+                let s1_j1 = values[4] || '-';
+                let s2_j1 = values[5] || '-';
+                let s3_j1 = values[6] || '-';
 
-                const s1_j2 = values[6] || '-';
-                const s2_j2 = values[7] || '-';
-                const s3_j2 = values[8] || '-';
+                // Sets de Jugador 2
+                let s1_j2 = values[7] || '-';
+                let s2_j2 = values[8] || '-';
+                let s3_j2 = values[9] || '-';
 
                 const card = document.createElement('div');
                 card.className = 'match-card';
                 card.innerHTML = `
-                    <div class="category-badge">${cat}</div>
+                    <!-- Categoría destacada arriba en rojo -->
+                    <div class="match-header">
+                        <span class="category-badge">${category}</span>
+                    </div>
+
+                    <!-- Fila Jugador 1 -->
                     <div class="player-row">
                         <span class="player-name">${j1}</span>
                         <div class="sets-container">
@@ -339,6 +351,8 @@
                             <span class="set-box">${s3_j1}</span>
                         </div>
                     </div>
+
+                    <!-- Fila Jugador 2 -->
                     <div class="player-row">
                         <span class="player-name">${j2}</span>
                         <div class="sets-container">
@@ -366,7 +380,7 @@
         }
 
         cargarDatos();
-        setInterval(cargarDatos, 15000); // Actualiza cada 15 segundos
+        setInterval(cargarDatos, 15000);
     </script>
 </body>
 </html>
