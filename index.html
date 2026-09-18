@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Tenis - VSD</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Visual Design Token CSS -->
+    <style>
+        :root {
+            /* Palette Definition */
+            --color-surface-mint: #e2f5ee;
+            --color-brand-green-dark: #123e2d;
+            --color-brand-green-mid: #1d5c43;
+            --color-brand-green-accent: #27825c;
+            
+            --color-light-bg: #f8faf9;
+            --color-light-surface: #ffffff;
+            --color-light-text-primary: #0f241c;
+            --color-light-text-secondary: #4a6358;
+            --color-light-border: #d2e3dc;
+
+            --color-dark-bg: #0b1a13;
+            --color-dark-surface: #14291f;
+            --color-dark-text-primary: #e6f2ec;
+            --color-dark-text-secondary: #90b3a3;
+            --color-dark-border: #234334;
+
+            /* Contextual Semantic Tokens (Default: Light Mode) */
+            --bg-body: var(--color-light-bg);
+            --bg-card: var(--color-light-surface);
+            --text-main: var(--color-light-text-primary);
+            --text-muted: var(--color-light-text-secondary);
+            --border-color: var(--color-light-border);
+            
+            --primary-accent: var(--color-brand-green-mid);
+            --primary-accent-hover: var(--color-brand-green-dark);
+            --hero-bg: var(--color-brand-green-dark);
+
+            /* Typography Tokens */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+            
+            /* Layout Tokens */
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --shadow-soft: 0 4px 15px rgba(18, 62, 45, 0.05);
+            --shadow-md: 0 8px 25px rgba(18, 62, 45, 0.08);
+        }
+
+        /* Dark Mode Theme Tokens */
+        [data-theme="dark"] {
+            --bg-body: var(--color-dark-bg);
+            --bg-card: var(--color-dark-surface);
+            --text-main: var(--color-dark-text-primary);
+            --text-muted: var(--color-dark-text-secondary);
+            --border-color: var(--color-dark-border);
+            
+            --primary-accent: var(--color-brand-green-accent);
+            --primary-accent-hover: var(--color-surface-mint);
+            --hero-bg: #07120d;
+        }
+
+        /* Basic Setup & Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header / Banner */
+        .hero {
+            background-color: var(--hero-bg);
+            color: #ffffff;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.3rem;
+            color: var(--color-surface-mint);
+        }
+
+        .hero p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.5rem 0.8rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: var(--font-body);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: -1.5rem auto 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Controls / Filters Section */
+        .controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.2fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-control:focus {
+            border-color: var(--primary-accent);
+        }
+
+        /* Table Area & Responsiveness */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: var(--color-surface-mint);
+            color: var(--color-brand-green-dark);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            padding: 1rem;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        [data-theme="dark"] th {
+            background-color: var(--color-dark-surface);
+            color: var(--color-surface-mint);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(39, 130, 92, 0.05);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ganador-cell {
+            font-weight: 700;
+            color: var(--primary-accent);
+        }
+
+        /* States (Loading / Empty) */
+        .state-container {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-accent);
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 0.8rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .oculto {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Block -->
+    <header class="hero">
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Cambiar tema">
+            <span id="themeIcon">🌙</span> <span id="themeText">Modo Oscuro</span>
+        </button>
+        <h1>Resultados Tenis VSD</h1>
+        <p>Consulta en tiempo real los resultados registrados del torneo</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <div class="card">
+            
+            <!-- Controls Section -->
+            <section class="controls">
+                <div class="form-group">
+                    <label for="buscarJugador">Buscar Jugador</label>
+                    <input type="text" id="buscarJugador" class="input-control" placeholder="Escribe el nombre de un jugador...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtroCategoria">Categoría</label>
+                    <select id="filtroCategoria" class="input-control">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="filtroFecha">Fecha del Partido</label>
+                    <input type="date" id="filtroFecha" class="input-control">
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div id="estado" class="state-container">
+                <div class="spinner"></div>
+                <p>Cargando resultados en tiempo real...</p>
+            </div>
+
+            <!-- Data Table -->
+            <div id="tablaWrapper" class="table-wrapper oculto">
+                <table>
+                    <thead>
+                        <tr id="headersTabla">
+                            <!-- Se generan dinámicamente -->
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                        <!-- Se generan dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty Results Message -->
+            <div id="sinResultados" class="state-container oculto">
+                <p>No se encontraron partidos que coincidan con los filtros aplicados.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Logic Script -->
+    <script>
+        // -------------------------------------------------------------
+        // CONFIGURACIÓN: URL de la API publicada en Google Apps Script
+        // -------------------------------------------------------------
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzApQzqG6EVZRXDxU0FrqQYmW7B-F8mUeN31v5mJAgYCzcJsy2opYT-v2jtwTnqLvXj/exec';
+
+        // Global State
+        let todosLosDatos = [];
+        let nombresColumnas = [];
+
+        // App Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarTema();
+            cargarDatos();
+
+            // Setup listeners para filtrado dinámico
+            document.getElementById('buscarJugador').addEventListener('input', aplicarFiltros);
+            document.getElementById('filtroCategoria').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroFecha').addEventListener('change', aplicarFiltros);
+        });
+
+        // -------------------------------------------------------------
+        // 1. Carga de Datos (Google Apps Script + Caché en LocalStorage)
+        // -------------------------------------------------------------
+        async function cargarDatos() {
+            // Intentar cargar caché local para respuesta instantánea
+            const datosCache = localStorage.getItem('vsd_resultados_cache');
+            if (datosCache) {
+                try {
+                    todosLosDatos = JSON.parse(datosCache);
+                    if (todosLosDatos.length > 0) {
+                        extraerColumnasYCategorias(todosLosDatos);
+                        renderizarTabla(todosLosDatos);
+                        document.getElementById('estado').classList.add('oculto');
+                        document.getElementById('tablaWrapper').classList.remove('oculto');
+                    }
+                } catch (e) {
+                    console.error("Error al leer caché previa", e);
+                }
+            }
+
+            // Consultar datos en vivo a la API de Apps Script
+            try {
+                const response = await fetch(API_URL);
+                const datos = await response.json();
+
+                if (datos && datos.length > 0) {
+                    todosLosDatos = datos;
+                    // Guardar en caché para próximas visitas
+                    localStorage.setItem('vsd_resultados_cache', JSON.stringify(datos));
+
+                    extraerColumnasYCategorias(todosLosDatos);
+                    renderizarTabla(todosLosDatos);
+
+                    document.getElementById('estado').classList.add('oculto');
+                    document.getElementById('tablaWrapper').classList.remove('oculto');
+                } else if (todosLosDatos.length === 0) {
+                    document.getElementById('estado').innerHTML = "<p>No hay resultados registrados aún.</p>";
+                }
+            } catch (error) {
+                console.warn('Conexión lenta o sin internet, utilizando datos en caché si existen.', error);
+                if (todosLosDatos.length === 0) {
+                    document.getElementById('estado').innerHTML = "<p>Error al cargar los datos. Por favor, reintenta más tarde.</p>";
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 2. Extraer Nombres de Columnas y Poblar Selector de Categorías
+        // -------------------------------------------------------------
+        function extraerColumnasYCategorias(datos) {
+            nombresColumnas = Object.keys(datos[0]);
+
+            // Detectar columna de categoría si existe
+            const colCategoria = nombresColumnas.find(key => key.toLowerCase().includes('categor'));
+            
+            if (colCategoria) {
+                const categoriasUnicas = [...new Set(datos.map(item => item[colCategoria]))].filter(Boolean);
+                const selectCat = document.getElementById('filtroCategoria');
+                
+                // Limpiar opciones previas excepto la primera
+                selectCat.innerHTML = '<option value="">Todas las categorías</option>';
+
+                categoriasUnicas.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    selectCat.appendChild(option);
+                });
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 3. Renderizar Tabla Dinámicamente
+        // -------------------------------------------------------------
+        function renderizarTabla(datos) {
+            const headersTabla = document.getElementById('headersTabla');
+            const cuerpoTabla = document.getElementById('cuerpoTabla');
+
+            headersTabla.innerHTML = '';
+            cuerpoTabla.innerHTML = '';
+
+            if (datos.length === 0) {
+                document.getElementById('tablaWrapper').classList.add('oculto');
+                document.getElementById('sinResultados').classList.remove('oculto');
+                return;
+            }
+
+            document.getElementById('tablaWrapper').classList.remove('oculto');
+            document.getElementById('sinResultados').classList.add('oculto');
+
+            // Render Encabezados
+            nombresColumnas.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                headersTabla.appendChild(th);
+            });
+
+            // Render Filas
+            datos.forEach(fila => {
+                const tr = document.createElement('tr');
+
+                nombresColumnas.forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = fila[col] || '-';
+
+                    // Resaltar Ganadores si la columna contiene palabras clave
+                    if (col.toLowerCase().includes('ganador') || col.toLowerCase().includes('vencedor')) {
+                        td.classList.add('ganador-cell');
+                    }
+
+                    tr.appendChild(td);
+                });
+
+                cuerpoTabla.appendChild(tr);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // 4. Filtrado en Tiempo Real
+        // -------------------------------------------------------------
+        function aplicarFiltros() {
+            const textoBusqueda = document.getElementById('buscarJugador').value.toLowerCase().trim();
+            const categoriaSel = document.getElementById('filtroCategoria').value;
+            const fechaSel = document.getElementById('filtroFecha').value;
+
+            const datosFiltrados = todosLosDatos.filter(fila => {
+                // Filtro por Jugador (Busca en cualquier propiedad/columna)
+                const coincideTexto = textoBusqueda === '' || Object.values(fila).some(val => 
+                    String(val).toLowerCase().includes(textoBusqueda)
+                );
+
+                // Filtro por Categoría
+                const colCategoria = nombresColumnas.find(key => key.toLowerCase().includes('categor'));
+                const coincideCat = !categoriaSel || (colCategoria && fila[colCategoria] === categoriaSel);
+
+                // Filtro por Fecha
+                const colFecha = nombresColumnas.find(key => key.toLowerCase().includes('fecha'));
+                let coincideFecha = true;
+                if (fechaSel && colFecha && fila[colFecha]) {
+                    // Normalización simple para comparar la fecha seleccionada con el texto
+                    coincideFecha = fila[colFecha].includes(fechaSel) || 
+                                   formatearFechaParaComparacion(fila[colFecha]) === fechaSel;
+                }
+
+                return coincideTexto && coincideCat && coincideFecha;
+            });
+
+            renderizarTabla(datosFiltrados);
+        }
+
+        function formatearFechaParaComparacion(fechaStr) {
+            // Convierte DD/MM/YYYY a YYYY-MM-DD para igualar la entrada del input date
+            const partes = fechaStr.split(' ')[0].split('/');
+            if (partes.length === 3) {
+                return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
+            }
+            return fechaStr;
+        }
+
+        // -------------------------------------------------------------
+        // 5. Gestión del Tema (Claro / Oscuro)
+        // -------------------------------------------------------------
+        function inicializarTema() {
+            const themeBtn = document.getElementById('themeToggleBtn');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            // Detectar preferencia guardada o del sistema
+            const temaGuardado = localStorage.getItem('vsd_theme');
+            const prefiereOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (temaGuardado === 'dark' || (!temaGuardado && prefiereOscuro)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Modo Claro';
+            }
+
+            themeBtn.addEventListener('click', () => {
+                const esOscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                
+                if (esOscuro) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('vsd_theme', 'light');
+                    themeIcon.textContent = '🌙';
+                    themeText.textContent = 'Modo Oscuro';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('vsd_theme', 'dark');
+                    themeIcon.textContent = '☀️';
+                    themeText.textContent = 'Modo Claro';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
