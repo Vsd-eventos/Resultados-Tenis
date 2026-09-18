@@ -4,32 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VSD Eventos - Torneo de Voley</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
+ 
     <style>
         :root {
             --color-negro: #121212;
             --color-rojo: #e31d2b;
             --color-blanco: #ffffff;
-            --color-gris-fondo: #152241;
+            --color-fondo: #152241;
             --color-gris-linea: #e2e8f0;
             --fuente-principal: 'Oswald', sans-serif;
             --fuente-secundaria: 'Roboto', sans-serif;
         }
-
+ 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
+ 
         body {
             font-family: var(--fuente-secundaria);
-            background-color: var(--color-gris-fondo);
+            background-color: var(--color-fondo);
             color: var(--color-negro);
             padding-bottom: 50px;
         }
-
+ 
         header {
             background-color: var(--color-negro);
             color: var(--color-blanco);
@@ -42,13 +44,13 @@
             gap: 15px;
             flex-wrap: wrap;
         }
-
+ 
         .header-brand {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-
+ 
         .logo-cuadrado {
             background-color: #de020a;
             color: var(--color-blanco);
@@ -64,14 +66,14 @@
             line-height: 0.95;
             box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
-
+ 
         .logo-cuadrado .vsd-text {
             font-size: 1.35rem;
             font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
-
+ 
         .logo-cuadrado .eventos-text {
             font-size: 0.62rem;
             font-weight: 500;
@@ -79,7 +81,7 @@
             letter-spacing: 0.5px;
             opacity: 0.95;
         }
-
+ 
         header h1 {
             font-family: var(--fuente-principal);
             font-weight: 700;
@@ -88,11 +90,11 @@
             letter-spacing: 1.2px;
             line-height: 1.2;
         }
-
+ 
         header h1 span.rojo {
             color: var(--color-rojo);
         }
-
+ 
         .select-categoria {
             background-color: #1e1e1e;
             color: var(--color-blanco);
@@ -102,16 +104,22 @@
             padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
-            outline: none;
             text-transform: uppercase;
         }
-
+ 
+        /* Se quitó "outline: none" (dejaba el select sin foco visible para teclado) */
+        .select-categoria:focus-visible,
+        .btn-dia:focus-visible {
+            outline: 3px solid var(--color-blanco);
+            outline-offset: 2px;
+        }
+ 
         .main-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 0 15px;
         }
-
+ 
         .filtros-dias {
             display: flex;
             justify-content: center;
@@ -119,7 +127,7 @@
             margin: 25px 0 15px;
             flex-wrap: wrap;
         }
-
+ 
         .btn-dia {
             background-color: var(--color-blanco);
             color: var(--color-negro);
@@ -132,20 +140,25 @@
             cursor: pointer;
             text-transform: uppercase;
         }
-
+ 
         .btn-dia.activo {
             background-color: var(--color-rojo);
             color: var(--color-blanco);
             border-color: var(--color-rojo);
         }
-
+ 
         .loading {
             color: var(--color-blanco);
             text-align: center;
             padding: 30px 0;
             font-size: 1.1rem;
+            line-height: 1.6;
         }
-
+ 
+        .loading.error {
+            color: #ff6b6b;
+        }
+ 
         /* --- FORMATO TARJETA --- */
         #matchesContainer {
             display: flex;
@@ -153,7 +166,7 @@
             gap: 15px;
             margin-top: 10px;
         }
-
+ 
         .match-card {
             background-color: var(--color-blanco);
             border-radius: 10px;
@@ -164,11 +177,11 @@
             flex-direction: column;
             gap: 8px;
         }
-
+ 
         .match-header {
             margin-bottom: 4px;
         }
-
+ 
         .category-badge {
             font-family: var(--fuente-principal);
             font-weight: 700;
@@ -177,27 +190,32 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
+ 
         .player-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
             background-color: #f8f9fa;
             padding: 8px 12px;
             border-radius: 6px;
         }
-
+ 
+        /* Nombres largos ya no empujan los casilleros de sets fuera de la tarjeta */
         .player-name {
             font-weight: 600;
             font-size: 1rem;
             color: var(--color-negro);
+            min-width: 0;
+            overflow-wrap: anywhere;
         }
-
+ 
         .sets-container {
             display: flex;
             gap: 6px;
+            flex-shrink: 0;
         }
-
+ 
         .set-box {
             background-color: #e2e8f0;
             color: #121212;
@@ -211,10 +229,19 @@
             justify-content: center;
             border-radius: 4px;
         }
+ 
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .select-categoria {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-
+ 
     <header>
         <div class="header-brand">
             <div class="logo-cuadrado">
@@ -223,8 +250,8 @@
             </div>
             <h1>Torneo de <span class="rojo">Voley</span></h1>
         </div>
-
-        <select id="select-categoria" class="select-categoria" onchange="filtrarPorCategoria(this.value)">
+ 
+        <select id="select-categoria" class="select-categoria" aria-label="Filtrar por categoría" onchange="filtrarPorCategoria(this.value)">
             <option value="TODAS">🏆 Todas las Categorías</option>
             <option value="SUB 10">Sub 10</option>
             <option value="SUB 12">Sub 12</option>
@@ -233,178 +260,233 @@
             <option value="SUB 18">Sub 18</option>
         </select>
     </header>
-
+ 
     <div class="main-container">
         <div class="filtros-dias">
-            <button class="btn-dia" onclick="filtrarPorDia('VIERNES')">Viernes</button>
-            <button class="btn-dia" onclick="filtrarPorDia('SABADO')">Sábado</button>
-            <button class="btn-dia" onclick="filtrarPorDia('DOMINGO')">Domingo</button>
-            <button class="btn-dia activo" onclick="filtrarPorDia('TODOS')">Todos los Días</button>
+            <button class="btn-dia" data-dia="VIERNES" onclick="filtrarPorDia('VIERNES')">Viernes</button>
+            <button class="btn-dia" data-dia="SABADO" onclick="filtrarPorDia('SABADO')">Sábado</button>
+            <button class="btn-dia" data-dia="DOMINGO" onclick="filtrarPorDia('DOMINGO')">Domingo</button>
+            <button class="btn-dia activo" data-dia="TODOS" onclick="filtrarPorDia('TODOS')">Todos los Días</button>
         </div>
-
-        <div id="matchesContainer">
+ 
+        <div id="matchesContainer" aria-live="polite">
             <p class="loading">Cargando partidos...</p>
         </div>
     </div>
-
+ 
     <script>
         const SPREADSHEET_ID = '1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U';
-        
-        let rawSheetData = [];
+ 
+        // Cantidad de filas de encabezado que tiene la planilla (poné 0 si no tiene títulos)
+        const FILAS_ENCABEZADO = 1;
+        const INTERVALO_ACTUALIZACION = 15000;
+        const TOTAL_COLUMNAS = 10; // Fecha, Categoría, J1, J2, 3 sets J1, 3 sets J2
+        const DIAS_SEMANA = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+ 
+        let filas = [];          // [{ celdas: [...], fechaRaw }]
+        let firmaDatos = '';     // para no redibujar si no cambió nada
+        let cargando = false;
         let diaSeleccionado = 'TODOS';
         let categoriaSeleccionada = 'TODAS';
-
+ 
+        /* ---------- Utilidades ---------- */
+ 
+        // Mayúsculas, sin tildes y sin espacios sobrantes: "Sábado" -> "SABADO"
+        function normalizar(texto) {
+            return String(texto ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toUpperCase()
+                .trim();
+        }
+ 
+        // "Sub-12", "SUB 12", "sub12" -> "SUB12"
+        function claveCategoria(texto) {
+            return normalizar(texto).replace(/[\s\-_.]/g, '');
+        }
+ 
+        // Evita que el contenido de la planilla rompa o inyecte HTML
+        function escapeHTML(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+ 
+        /* ---------- Carga de datos ---------- */
+ 
         async function cargarDatos() {
+            if (cargando) return; // evita pedidos superpuestos
+            cargando = true;
+ 
             try {
-                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
-                const response = await fetch(url);
+                // "_" evita respuestas viejas en caché; "headers" fija cuántas filas son títulos
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=${FILAS_ENCABEZADO}&_=${Date.now()}`;
+                const response = await fetch(url, { cache: 'no-store' });
                 if (!response.ok) throw new Error('Error al acceder a la planilla');
-
+ 
                 const text = await response.text();
-                const jsonText = text.match(/(?<="table":).*(?=}\);)/s);
-                if (!jsonText) throw new Error('Formato de datos no válido');
-
-                const table = JSON.parse(jsonText[0]);
-                
-                rawSheetData = table.rows.map(row => {
-                    return row.c.map(cell => {
-                        if (!cell) return '';
-                        // Usar la propiedad 'f' (texto formateado) si existe, de lo contrario 'v' (valor raw)
-                        return cell.f !== undefined ? cell.f : (cell.v !== null ? cell.v : '');
-                    });
+ 
+                // La respuesta viene envuelta en google.visualization.Query.setResponse({...});
+                // Se extrae el JSON completo sin usar lookbehind (rompe Safari/iOS viejos)
+                const inicio = text.indexOf('{');
+                const fin = text.lastIndexOf('}');
+                if (inicio === -1 || fin === -1) throw new Error('Formato de datos no válido');
+ 
+                const json = JSON.parse(text.substring(inicio, fin + 1));
+                if (json.status === 'error') throw new Error('Google devolvió un error');
+                if (!json.table || !Array.isArray(json.table.rows)) throw new Error('Formato de datos no válido');
+ 
+                const nuevasFilas = json.table.rows.map(row => {
+                    const c = row.c || [];
+                    const celdas = [];
+                    for (let i = 0; i < TOTAL_COLUMNAS; i++) {
+                        const cell = c[i];
+                        // 'f' = texto formateado, 'v' = valor crudo
+                        celdas.push(!cell ? '' : (cell.f ?? cell.v ?? ''));
+                    }
+                    // Valor crudo de la fecha (ej: "Date(2026,8,18)"), más fiable que el texto formateado
+                    const fechaRaw = c[0] ? (c[0].v ?? c[0].f ?? '') : '';
+                    return { celdas, fechaRaw };
                 });
-
+ 
+                const firma = JSON.stringify(nuevasFilas);
+                if (firma === firmaDatos) return; // sin cambios: no se redibuja
+ 
+                firmaDatos = firma;
+                filas = nuevasFilas;
                 actualizarListaPartidos();
             } catch (error) {
                 console.error('Error al cargar datos:', error);
-                document.getElementById('matchesContainer').innerHTML = `
-                    <p class="loading" style="color: #ff6b6b;">
-                        Error al cargar datos.<br>
-                        1. Revisa haber puesto el SPREADSHEET_ID correcto.<br>
-                        2. Comprueba que el archivo de Google Sheets tenga permisos de acceso público ("Cualquier persona con el enlace").
-                    </p>`;
+                // Si ya había partidos en pantalla, se mantienen (un corte de red no borra todo)
+                if (filas.length === 0) {
+                    document.getElementById('matchesContainer').innerHTML = `
+                        <p class="loading error">
+                            No se pudieron cargar los partidos.<br>
+                            1. Revisá que el SPREADSHEET_ID sea el correcto.<br>
+                            2. Comprobá que la planilla esté compartida como "Cualquier persona con el enlace".
+                        </p>`;
+                }
+            } finally {
+                cargando = false;
             }
         }
-
-        // Función para extraer el nombre del día desde el valor de la columna 0 (Fecha)
-        function obtenerDiaTexto(valorFecha) {
-            if (!valorFecha) return '';
-            const textoStr = String(valorFecha).toUpperCase();
-
-            // Si la celda contiene directamente el nombre del día
-            if (textoStr.includes('VIERNES')) return 'VIERNES';
-            if (textoStr.includes('SABADO') || textoStr.includes('SÁBADO')) return 'SABADO';
-            if (textoStr.includes('DOMINGO')) return 'DOMINGO';
-
-            // Si es un formato de fecha de Google Viz, por ejemplo: Date(2026,8,18,...)
-            let matchDateObj = String(valorFecha).match(/Date\((\d+),(\d+),(\d+)/);
-            let dateObj;
-            if (matchDateObj) {
-                let anio = parseInt(matchDateObj[1]);
-                let mes = parseInt(matchDateObj[2]);
-                let dia = parseInt(matchDateObj[3]);
-                dateObj = new Date(anio, mes, dia);
+ 
+        /* ---------- Día de la semana ---------- */
+ 
+        function obtenerDia(fila) {
+            const texto = normalizar(fila.celdas[0]);
+ 
+            // 1) La celda ya dice el día ("Viernes", "SÁBADO 19/09", ...)
+            for (const dia of ['VIERNES', 'SABADO', 'DOMINGO']) {
+                if (texto.includes(dia)) return dia;
+            }
+ 
+            // 2) Es una fecha: se arma con año/mes/día a mano para evitar
+            //    errores de zona horaria y de formato día/mes vs mes/día
+            let anio, mes, dia; // mes base 0
+            let r;
+ 
+            if ((r = String(fila.fechaRaw).match(/Date\((\d+),\s*(\d+),\s*(\d+)/))) {
+                anio = +r[1]; mes = +r[2]; dia = +r[3];          // gviz ya trae el mes base 0
+            } else if ((r = texto.match(/(\d{4})-(\d{2})-(\d{2})/))) {
+                anio = +r[1]; mes = +r[2] - 1; dia = +r[3];      // 2026-09-18
+            } else if ((r = texto.match(/(?:^|\D)(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4}|\d{2})(?!\d)/))) {
+                dia = +r[1]; mes = +r[2] - 1; anio = +r[3];      // 18/09/2026
+                if (anio < 100) anio += 2000;
             } else {
-                // Intento estándar de parsear la fecha
-                dateObj = new Date(valorFecha);
+                return '';
             }
-
-            if (!isNaN(dateObj.getTime())) {
-                const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
-                return diasSemana[dateObj.getDay()];
-            }
-
-            return textoStr;
+ 
+            const fecha = new Date(anio, mes, dia);
+            return isNaN(fecha.getTime()) ? '' : DIAS_SEMANA[fecha.getDay()];
         }
-
+ 
+        /* ---------- Dibujo de tarjetas ---------- */
+ 
+        function casillero(valor) {
+            const vacio = valor === '' || valor === null || valor === undefined;
+            return `<span class="set-box">${escapeHTML(vacio ? '-' : valor)}</span>`;
+        }
+ 
         function actualizarListaPartidos() {
             const container = document.getElementById('matchesContainer');
-            container.innerHTML = '';
-
-            const filtrados = rawSheetData.filter(fila => {
-                const fechaCol = fila[0] || '';
-                const diaFila = obtenerDiaTexto(fechaCol);
-                const textoFilaCompleta = JSON.stringify(fila).toUpperCase();
-
-                // Filtrar por Día
-                if (diaSeleccionado !== 'TODOS') {
-                    if (diaFila !== diaSeleccionado && !textoFilaCompleta.includes(diaSeleccionado)) {
-                        return false;
-                    }
+ 
+            const filtrados = filas.filter(fila => {
+                const [, categoria, j1, j2] = fila.celdas;
+ 
+                // Descarta filas vacías (antes aparecían como "Jugador 1 / Jugador 2")
+                if (!String(j1).trim() && !String(j2).trim()) return false;
+ 
+                // Filtro por día: solo mira la columna de fecha
+                // (antes buscaba en toda la fila y "Domingo" como nombre de jugador colaba partidos)
+                if (diaSeleccionado !== 'TODOS' && obtenerDia(fila) !== diaSeleccionado) return false;
+ 
+                // Filtro por categoría: solo mira la columna de categoría
+                if (categoriaSeleccionada !== 'TODAS' &&
+                    !claveCategoria(categoria).includes(claveCategoria(categoriaSeleccionada))) {
+                    return false;
                 }
-
-                // Filtrar por Categoría
-                if (categoriaSeleccionada !== 'TODAS') {
-                    if (!textoFilaCompleta.includes(categoriaSeleccionada)) return false;
-                }
-
+ 
                 return true;
             });
-
+ 
             if (filtrados.length === 0) {
                 container.innerHTML = '<p class="loading">No hay partidos registrados para esta selección.</p>';
                 return;
             }
-
-            filtrados.forEach(values => {
-                let category = values[1] || 'CATEGORÍA';
-                let j1 = values[2] || 'Jugador 1';
-                let j2 = values[3] || 'Jugador 2';
-
-                // Sets Jugador 1
-                let s1_j1 = values[4] !== undefined && values[4] !== '' ? values[4] : '-';
-                let s2_j1 = values[5] !== undefined && values[5] !== '' ? values[5] : '-';
-                let s3_j1 = values[6] !== undefined && values[6] !== '' ? values[6] : '-';
-
-                // Sets Jugador 2
-                let s1_j2 = values[7] !== undefined && values[7] !== '' ? values[7] : '-';
-                let s2_j2 = values[8] !== undefined && values[8] !== '' ? values[8] : '-';
-                let s3_j2 = values[9] !== undefined && values[9] !== '' ? values[9] : '-';
-
+ 
+            container.innerHTML = '';
+ 
+            filtrados.forEach(({ celdas }) => {
+                const categoria = celdas[1] || 'Categoría';
+                const j1 = celdas[2] || 'Por definir';
+                const j2 = celdas[3] || 'Por definir';
+ 
                 const card = document.createElement('div');
                 card.className = 'match-card';
                 card.innerHTML = `
                     <div class="match-header">
-                        <span class="category-badge">${category}</span>
+                        <span class="category-badge">${escapeHTML(categoria)}</span>
                     </div>
-
+ 
                     <div class="player-row">
-                        <span class="player-name">${j1}</span>
+                        <span class="player-name">${escapeHTML(j1)}</span>
                         <div class="sets-container">
-                            <span class="set-box">${s1_j1}</span>
-                            <span class="set-box">${s2_j1}</span>
-                            <span class="set-box">${s3_j1}</span>
+                            ${casillero(celdas[4])}${casillero(celdas[5])}${casillero(celdas[6])}
                         </div>
                     </div>
-
+ 
                     <div class="player-row">
-                        <span class="player-name">${j2}</span>
+                        <span class="player-name">${escapeHTML(j2)}</span>
                         <div class="sets-container">
-                            <span class="set-box">${s1_j2}</span>
-                            <span class="set-box">${s2_j2}</span>
-                            <span class="set-box">${s3_j2}</span>
+                            ${casillero(celdas[7])}${casillero(celdas[8])}${casillero(celdas[9])}
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
-
+ 
+        /* ---------- Filtros ---------- */
+ 
         function filtrarPorDia(dia) {
             diaSeleccionado = dia;
+            // Se compara con data-dia (antes se comparaba el texto del botón:
+            // "SÁBADO" no coincidía con "SABADO" y el botón nunca se marcaba)
             document.querySelectorAll('.btn-dia').forEach(btn => {
-                btn.classList.toggle('activo', btn.textContent.toUpperCase().includes(dia));
+                btn.classList.toggle('activo', btn.dataset.dia === dia);
             });
             actualizarListaPartidos();
         }
-
+ 
         function filtrarPorCategoria(cat) {
             categoriaSeleccionada = cat;
             actualizarListaPartidos();
         }
-
+ 
         cargarDatos();
-        setInterval(cargarDatos, 15000);
+        setInterval(cargarDatos, INTERVALO_ACTUALIZACION);
     </script>
 </body>
 </html>
+ 
