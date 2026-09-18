@@ -249,7 +249,7 @@
 
     <script>
         // PEGA AQUÍ EL ID DE TU GOOGLE SHEET (el código entre /d/ y /edit en el enlace de tu planilla)
-        const SPREADSHEET_ID = 'TU_ID_DE_GOOGLE_SHEET_AQUI';
+        const SPREADSHEET_ID = 'https://docs.google.com/spreadsheets/d/1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U/edit?resourcekey=&gid=463646504#gid=463646504';
         
         let rawSheetData = [];
         let diaSeleccionado = 'TODOS';
@@ -258,7 +258,7 @@
         async function cargarDatos() {
             try {
                 // Endpoint nativo de lectura JSON de Google
-                const url = `https://docs.google.com/spreadsheets/d/1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U/edit?resourcekey=&gid=463646504#gid=463646504`;
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Error al acceder a la planilla');
 
