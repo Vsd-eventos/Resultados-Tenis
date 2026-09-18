@@ -146,7 +146,7 @@
             font-size: 1.1rem;
         }
 
-        /* --- ESTILOS DE LA TARJETA CORREGIDA --- */
+        /* --- FORMATO TARJETA --- */
         #matchesContainer {
             display: flex;
             flex-direction: column;
@@ -248,46 +248,41 @@
     </div>
 
     <script>
-        // PEGA AQUÍ LA URL DE TU CSV PUBLICADO EN LA WEB
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vREEMPLAZA_ESTO_CON_TU_URL_CSV/pub?output=csv';
+        // PEGA AQUÍ EL ID DE TU GOOGLE SHEET (el código entre /d/ y /edit en el enlace de tu planilla)
+        const SPREADSHEET_ID = 'TU_ID_DE_GOOGLE_SHEET_AQUI';
         
         let rawSheetData = [];
         let diaSeleccionado = 'TODOS';
         let categoriaSeleccionada = 'TODAS';
 
-        function parseCSV(text) {
-            const lines = text.split('\n').filter(l => l.trim() !== '');
-            if (lines.length === 0) return [];
-
-            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            const result = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const currentLine = lines[i].split(',').map(item => item.trim().replace(/^"|"$/g, ''));
-                if (currentLine.length < headers.length) continue;
-
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = currentLine[index] || "";
-                });
-                result.push(obj);
-            }
-            return result;
-        }
-
         async function cargarDatos() {
             try {
-                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
-                if (!response.ok) throw new Error('No se pudo acceder al CSV');
+                // Endpoint nativo de lectura JSON de Google
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Error al acceder a la planilla');
 
-                const csvText = await response.text();
-                rawSheetData = parseCSV(csvText);
+                const text = await response.text();
+                
+                // Extraer el JSON limpio del wrapper de Google
+                const jsonText = text.match(/(?<="table":).*(?=}\);)/s);
+                if (!jsonText) throw new Error('Formato de datos no válido');
+
+                const table = JSON.parse(jsonText[0]);
+                
+                // Formatear filas
+                rawSheetData = table.rows.map(row => {
+                    return row.c.map(cell => cell ? (cell.v !== null ? cell.v : '') : '');
+                });
+
                 actualizarListaPartidos();
             } catch (error) {
                 console.error('Error al cargar datos:', error);
                 document.getElementById('matchesContainer').innerHTML = `
                     <p class="loading" style="color: #ff6b6b;">
-                        Error al cargar datos. Verifica el enlace CSV de tu hoja de cálculo.
+                        Error al cargar datos.<br>
+                        1. Revisa haber puesto el SPREADSHEET_ID correcto.<br>
+                        2. Comprueba que el archivo de Google Sheets tenga permisos de acceso público ("Cualquier persona con el enlace").
                     </p>`;
             }
         }
@@ -311,38 +306,37 @@
             });
 
             if (filtrados.length === 0) {
-                container.innerHTML = '<p class="loading">No hay partidos para los filtros seleccionados.</p>';
+                container.innerHTML = '<p class="loading">No hay partidos registrados para esta selección.</p>';
                 return;
             }
 
-            filtrados.forEach(fila => {
-                const values = Object.values(fila);
-
-                // Asignación explícita de campos según la columna del Google Sheet
-                // Columna 0: Marca Temporal/Día | Columna 1: Categoría | Columna 2: Jugador 1 | Columna 3: Jugador 2
+            filtrados.forEach(values => {
+                // Mapeo automático de columnas:
+                // Columna 0: Marca temporal / Fecha
+                // Columna 1: Categoría
+                // Columna 2: Jugador 1
+                // Columna 3: Jugador 2
                 let category = values[1] || 'CATEGORÍA';
                 let j1 = values[2] || 'Jugador 1';
                 let j2 = values[3] || 'Jugador 2';
 
-                // Sets de Jugador 1
-                let s1_j1 = values[4] || '-';
-                let s2_j1 = values[5] || '-';
-                let s3_j1 = values[6] || '-';
+                // Sets Jugador 1
+                let s1_j1 = values[4] !== undefined && values[4] !== '' ? values[4] : '-';
+                let s2_j1 = values[5] !== undefined && values[5] !== '' ? values[5] : '-';
+                let s3_j1 = values[6] !== undefined && values[6] !== '' ? values[6] : '-';
 
-                // Sets de Jugador 2
-                let s1_j2 = values[7] || '-';
-                let s2_j2 = values[8] || '-';
-                let s3_j2 = values[9] || '-';
+                // Sets Jugador 2
+                let s1_j2 = values[7] !== undefined && values[7] !== '' ? values[7] : '-';
+                let s2_j2 = values[8] !== undefined && values[8] !== '' ? values[8] : '-';
+                let s3_j2 = values[9] !== undefined && values[9] !== '' ? values[9] : '-';
 
                 const card = document.createElement('div');
                 card.className = 'match-card';
                 card.innerHTML = `
-                    <!-- Categoría destacada arriba en rojo -->
                     <div class="match-header">
                         <span class="category-badge">${category}</span>
                     </div>
 
-                    <!-- Fila Jugador 1 -->
                     <div class="player-row">
                         <span class="player-name">${j1}</span>
                         <div class="sets-container">
@@ -352,7 +346,6 @@
                         </div>
                     </div>
 
-                    <!-- Fila Jugador 2 -->
                     <div class="player-row">
                         <span class="player-name">${j2}</span>
                         <div class="sets-container">
