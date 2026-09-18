@@ -3,70 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados de Tenis - VSD</title>
+    <title>VSD Eventos - Torneo de Voley</title>
+    <!-- Importamos fuentes desde Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Visual Design Token CSS -->
     <style>
+        /* --- VARIABLES Y PALETA DE COLORES --- */
         :root {
-            /* Palette Definition */
-            --color-surface-mint: #e2f5ee;
-            --color-brand-green-dark: #123e2d;
-            --color-brand-green-mid: #1d5c43;
-            --color-brand-green-accent: #27825c;
-            
-            --color-light-bg: #f8faf9;
-            --color-light-surface: #ffffff;
-            --color-light-text-primary: #0f241c;
-            --color-light-text-secondary: #4a6358;
-            --color-light-border: #d2e3dc;
-
-            --color-dark-bg: #0b1a13;
-            --color-dark-surface: #14291f;
-            --color-dark-text-primary: #e6f2ec;
-            --color-dark-text-secondary: #90b3a3;
-            --color-dark-border: #234334;
-
-            /* Contextual Semantic Tokens (Default: Light Mode) */
-            --bg-body: var(--color-light-bg);
-            --bg-card: var(--color-light-surface);
-            --text-main: var(--color-light-text-primary);
-            --text-muted: var(--color-light-text-secondary);
-            --border-color: var(--color-light-border);
-            
-            --primary-accent: var(--color-brand-green-mid);
-            --primary-accent-hover: var(--color-brand-green-dark);
-            --hero-bg: var(--color-brand-green-dark);
-
-            /* Typography Tokens */
-            --font-heading: 'Montserrat', sans-serif;
-            --font-body: 'Poppins', sans-serif;
-            
-            /* Layout Tokens */
-            --radius-md: 8px;
-            --radius-lg: 16px;
-            --shadow-soft: 0 4px 15px rgba(18, 62, 45, 0.05);
-            --shadow-md: 0 8px 25px rgba(18, 62, 45, 0.08);
+            --color-negro: #121212;
+            --color-rojo: #e31d2b;
+            --color-rojo-hover: #b8121f;
+            --color-ganador: #1b5e20;
+            --color-ganador-bg: #e8f5e9;
+            --color-ganador-border: #81c784;
+            --color-blanco: #ffffff;
+            --color-gris-fondo: #152241;
+            --color-gris-linea: #e2e8f0;
+            --fuente-principal: 'Oswald', sans-serif;
+            --fuente-secundaria: 'Roboto', sans-serif;
         }
 
-        /* Dark Mode Theme Tokens */
-        [data-theme="dark"] {
-            --bg-body: var(--color-dark-bg);
-            --bg-card: var(--color-dark-surface);
-            --text-main: var(--color-dark-text-primary);
-            --text-muted: var(--color-dark-text-secondary);
-            --border-color: var(--color-dark-border);
-            
-            --primary-accent: var(--color-brand-green-accent);
-            --primary-accent-hover: var(--color-surface-mint);
-            --hero-bg: #07120d;
-        }
-
-        /* Basic Setup & Reset */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -74,485 +30,610 @@
         }
 
         body {
-            font-family: var(--font-body);
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.5;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: var(--fuente-secundaria);
+            background-color: var(--color-gris-fondo);
+            color: var(--color-negro);
+            padding-bottom: 50px;
         }
 
-        /* Header / Banner */
-        .hero {
-            background-color: var(--hero-bg);
-            color: #ffffff;
-            padding: 2.5rem 1rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .hero h1 {
-            font-family: var(--font-heading);
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 0.3rem;
-            color: var(--color-surface-mint);
-        }
-
-        .hero p {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        /* Theme Toggle Button */
-        .theme-toggle {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            padding: 0.5rem 0.8rem;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-family: var(--font-body);
+        /* --- ENCABEZADO (HEADER) --- */
+        header {
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            padding: 15px 20px;
+            border-bottom: 5px solid var(--color-rojo);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            transition: background 0.2s ease;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: -1.5rem auto 2rem auto;
-            padding: 0 1rem;
-            width: 100%;
-            flex: 1;
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        /* Controls / Filters Section */
-        .controls {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1.2fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .controls {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .form-group {
+        .logo-cuadrado {
+            background-color: #de020a;
+            color: var(--color-blanco);
+            width: 58px;
+            height: 58px;
+            border-radius: 6px;
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            font-family: var(--fuente-principal);
+            line-height: 0.95;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
-        .form-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
+        .logo-cuadrado .vsd-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo-cuadrado .eventos-text {
+            font-size: 0.62rem;
+            font-weight: 500;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+            opacity: 0.95;
+        }
+
+        header h1 {
+            font-family: var(--fuente-principal);
+            font-weight: 700;
+            font-size: 2.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            line-height: 1.2;
+            text-align: left;
+        }
+
+        header h1 span.rojo {
+            color: var(--color-rojo);
+        }
+
+        /* --- FILTRO DROPDOWN DE CATEGORÍA --- */
+        .contenedor-categoria-filtro {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .select-categoria {
+            background-color: #1e1e1e;
+            color: var(--color-blanco);
+            border: 2px solid var(--color-rojo);
+            font-family: var(--fuente-principal);
+            font-size: 1.05rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            outline: none;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
 
-        .input-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
+        .select-categoria:hover, .select-categoria:focus {
+            background-color: var(--color-rojo);
+            border-color: #ffffff;
+        }
+
+        .select-categoria option {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: var(--fuente-secundaria);
             font-size: 0.95rem;
-            font-family: var(--font-body);
-            color: var(--text-main);
-            background-color: var(--bg-body);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            outline: none;
-            transition: border-color 0.2s ease;
         }
 
-        .input-control:focus {
-            border-color: var(--primary-accent);
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
         }
 
-        /* Table Area & Responsiveness */
-        .table-wrapper {
+        /* --- FILTROS POR DÍA --- */
+        .filtros-dias {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-dia {
+            background-color: var(--color-blanco);
+            color: var(--color-negro);
+            border: 2px solid var(--color-negro);
+            font-family: var(--fuente-principal);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .btn-dia:hover {
+            background-color: var(--color-rojo);
+            color: var(--color-blanco);
+            border-color: var(--color-rojo);
+        }
+
+        .btn-dia.activo {
+            background-color: var(--color-rojo);
+            color: var(--color-blanco);
+            border-color: var(--color-rojo);
+            box-shadow: 0 4px 10px rgba(227, 29, 43, 0.35);
+        }
+
+        /* --- SECCIÓN DE ESTADO --- */
+        #estado {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #ffffff;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+
+        #estado.oculto {
+            display: none !important;
+        }
+
+        /* --- CONTENEDOR DE LA TABLA (DESKTOP) --- */
+        .tabla-card {
+            background-color: var(--color-blanco);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+            border: 1px solid var(--color-gris-linea);
+        }
+
+        .table-responsive {
             width: 100%;
             overflow-x: auto;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
-            font-size: 0.95rem;
+            font-family: var(--fuente-secundaria);
+        }
+
+        thead {
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            font-family: var(--fuente-principal);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         th {
-            background-color: var(--color-surface-mint);
-            color: var(--color-brand-green-dark);
-            font-family: var(--font-heading);
-            font-weight: 700;
-            padding: 1rem;
-            white-space: nowrap;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        [data-theme="dark"] th {
-            background-color: var(--color-dark-surface);
-            color: var(--color-surface-mint);
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
-            white-space: nowrap;
+            padding: 14px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.05rem;
+            border-bottom: 3px solid var(--color-rojo);
         }
 
         tbody tr {
-            transition: background-color 0.15s ease;
+            border-bottom: 1px solid var(--color-gris-linea);
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
         }
 
         tbody tr:hover {
-            background-color: rgba(39, 130, 92, 0.05);
+            background-color: #fff5f5;
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .ganador-cell {
-            font-weight: 700;
-            color: var(--primary-accent);
-        }
-
-        /* States (Loading / Empty) */
-        .state-container {
+        td {
+            padding: 12px 14px;
+            color: var(--color-negro);
+            font-size: 0.95rem;
             text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-muted);
+            vertical-align: middle;
         }
 
-        .spinner {
+        .equipo-ganador {
+            font-weight: 700 !important;
+            color: var(--color-ganador) !important;
+            background-color: var(--color-ganador-bg) !important;
+            border: 2px solid var(--color-ganador-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(46, 125, 50, 0.15);
+        }
+
+        .badge-puntos {
             display: inline-block;
-            width: 35px;
-            height: 35px;
-            border: 3px solid var(--border-color);
-            border-radius: 50%;
-            border-top-color: var(--primary-accent);
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 0.8rem;
+            background-color: var(--color-negro);
+            color: var(--color-blanco);
+            font-family: var(--fuente-principal);
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 6px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .puntos-ganadores {
+            background-color: var(--color-rojo) !important;
+            color: var(--color-blanco) !important;
+            box-shadow: 0 2px 8px rgba(227, 29, 43, 0.4);
+            transform: scale(1.05);
         }
 
-        .oculto {
-            display: none !important;
+        /* --- VISTA MÓVIL (TARJETAS DEPORTIVAS) --- */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 15px;
+            }
+
+            .header-brand { width: 100%; }
+
+            .contenedor-categoria-filtro { width: 100%; }
+
+            .select-categoria { width: 100%; text-align: center; }
+
+            .logo-cuadrado { width: 48px; height: 48px; }
+
+            .logo-cuadrado .vsd-text { font-size: 1.1rem; }
+
+            .logo-cuadrado .eventos-text { font-size: 0.52rem; }
+
+            header h1 { font-size: 1.2rem; }
+
+            .btn-dia { padding: 7px 16px; font-size: 0.9rem; }
+
+            .tabla-card {
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+            }
+
+            .table-responsive { overflow-x: visible; }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+                width: 100%;
+            }
+
+            thead { display: none; }
+
+            tbody tr {
+                margin-bottom: 16px;
+                background-color: var(--color-blanco) !important;
+                border: 1px solid var(--color-gris-linea);
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                padding: 12px 16px;
+            }
+
+            td {
+                border: none;
+                padding: 8px 0;
+                text-align: right;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px dashed var(--color-gris-linea);
+                font-size: 0.95rem;
+            }
+
+            td:last-child { border-bottom: none; }
+
+            td::before {
+                content: attr(data-label);
+                font-family: var(--fuente-principal);
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #666;
+                font-size: 0.88rem;
+                text-align: left;
+                padding-right: 12px;
+                flex-shrink: 0;
+            }
+
+            .equipo-ganador { justify-content: flex-end; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Block -->
-    <header class="hero">
-        <button class="theme-toggle" id="themeToggleBtn" aria-label="Cambiar tema">
-            <span id="themeIcon">🌙</span> <span id="themeText">Modo Oscuro</span>
-        </button>
-        <h1>Resultados Tenis VSD</h1>
-        <p>Consulta en tiempo real los resultados registrados del torneo</p>
+    <header>
+        <div class="header-brand">
+            <div class="logo-cuadrado">
+                <span class="vsd-text">VSD</span>
+                <span class="eventos-text">eventos</span>
+            </div>
+            <h1>Torneo de <span class="rojo">Voley</span></h1>
+        </div>
+
+        <div class="contenedor-categoria-filtro">
+            <select id="select-categoria" class="select-categoria" onchange="filtrarPorCategoria(this.value)">
+                <option value="TODAS">🏆 Todas las Categorías</option>
+                <option value="SUB 10 MUJERES">Sub 10 Mujeres</option>
+                <option value="SUB 10 VARONES">Sub 10 Varones</option>
+                <option value="SUB 12 MUJERES">Sub 12 Mujeres</option>
+                <option value="SUB 12 VARONES">Sub 12 Varones</option>
+                <option value="SUB 14 MUJERES">Sub 14 Mujeres</option>
+                <option value="SUB 14 VARONES">Sub 14 Varones</option>
+                <option value="SUB 16 MUJERES">Sub 16 Mujeres</option>
+                <option value="SUB 16 VARONES">Sub 16 Varones</option>
+                <option value="SUB 18 VARONES">Sub 18 Varones</option>
+            </select>
+        </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="container">
-        <div class="card">
-            
-            <!-- Controls Section -->
-            <section class="controls">
-                <div class="form-group">
-                    <label for="buscarJugador">Buscar Jugador</label>
-                    <input type="text" id="buscarJugador" class="input-control" placeholder="Escribe el nombre de un jugador...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="filtroCategoria">Categoría</label>
-                    <select id="filtroCategoria" class="input-control">
-                        <option value="">Todas las categorías</option>
-                    </select>
-                </div>
+    <div class="main-container">
+        <div class="filtros-dias">
+            <button class="btn-dia" onclick="filtrarPorDia('VIERNES')">Viernes</button>
+            <button class="btn-dia" onclick="filtrarPorDia('SABADO')">Sábado</button>
+            <button class="btn-dia" onclick="filtrarPorDia('DOMINGO')">Domingo</button>
+            <button class="btn-dia activo" onclick="filtrarPorDia('TODOS')">Todos los Días</button>
+        </div>
 
-                <div class="form-group">
-                    <label for="filtroFecha">Fecha del Partido</label>
-                    <input type="date" id="filtroFecha" class="input-control">
-                </div>
-            </section>
+        <div id="estado">Cargando resultados...</div>
 
-            <!-- Loading Indicator -->
-            <div id="estado" class="state-container">
-                <div class="spinner"></div>
-                <p>Cargando resultados en tiempo real...</p>
-            </div>
-
-            <!-- Data Table -->
-            <div id="tablaWrapper" class="table-wrapper oculto">
-                <table>
+        <div class="tabla-card">
+            <div class="table-responsive">
+                <table id="tabla-resultados">
                     <thead>
-                        <tr id="headersTabla">
-                            <!-- Se generan dinámicamente -->
-                        </tr>
+                        <tr id="headers"></tr>
                     </thead>
-                    <tbody id="cuerpoTabla">
-                        <!-- Se generan dinámicamente -->
-                    </tbody>
+                    <tbody id="cuerpo-tabla"></tbody>
                 </table>
             </div>
-
-            <!-- Empty Results Message -->
-            <div id="sinResultados" class="state-container oculto">
-                <p>No se encontraron partidos que coincidan con los filtros aplicados.</p>
-            </div>
-
         </div>
-    </main>
+    </div>
 
-    <!-- Logic Script -->
     <script>
-        // -------------------------------------------------------------
-        // CONFIGURACIÓN: URL de la API publicada en Google Apps Script
-        // -------------------------------------------------------------
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzApQzqG6EVZRXDxU0FrqQYmW7B-F8mUeN31v5mJAgYCzcJsy2opYT-v2jtwTnqLvXj/exec';
+        // Reemplaza esta URL por la URL de despliegue de tu Web App de Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzApQzqG6EVZRXDxU0FrqQYmW7B-F8mUeN31v5mJAgYCzcJsy2opYT-v2jtwTnqLvXj/exec'; 
+        const TIEMPO_REFRESCO_MS = 20000;
 
-        // Global State
         let todosLosDatos = [];
-        let nombresColumnas = [];
+        let diaSeleccionado = 'TODOS';
+        let categoriaSeleccionada = 'TODAS';
 
-        // App Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            inicializarTema();
-            cargarDatos();
+        function normalizarTexto(txt) {
+            if (!txt) return "";
+            return String(txt).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
 
-            // Setup listeners para filtrado dinámico
-            document.getElementById('buscarJugador').addEventListener('input', aplicarFiltros);
-            document.getElementById('filtroCategoria').addEventListener('change', aplicarFiltros);
-            document.getElementById('filtroFecha').addEventListener('change', aplicarFiltros);
-        });
-
-        // -------------------------------------------------------------
-        // 1. Carga de Datos (Google Apps Script + Caché en LocalStorage)
-        // -------------------------------------------------------------
         async function cargarDatos() {
-            // Intentar cargar caché local para respuesta instantánea
+            // Intentar renderizar datos cacheados previamente
             const datosCache = localStorage.getItem('vsd_resultados_cache');
-            if (datosCache) {
+            if (datosCache && todosLosDatos.length === 0) {
                 try {
                     todosLosDatos = JSON.parse(datosCache);
-                    if (todosLosDatos.length > 0) {
-                        extraerColumnasYCategorias(todosLosDatos);
-                        renderizarTabla(todosLosDatos);
-                        document.getElementById('estado').classList.add('oculto');
-                        document.getElementById('tablaWrapper').classList.remove('oculto');
-                    }
+                    renderizarTabla();
+                    document.getElementById('estado').classList.add('oculto');
                 } catch (e) {
-                    console.error("Error al leer caché previa", e);
+                    console.error("Error al leer caché de datos", e);
                 }
             }
 
-            // Consultar datos en vivo a la API de Apps Script
             try {
-                const response = await fetch(API_URL);
+                // Petición al endpoint JSON del Google Apps Script
+                const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error('Error al conectar con Apps Script');
+
                 const datos = await response.json();
 
-                if (datos && datos.length > 0) {
+                if (datos && Array.isArray(datos) && datos.length > 0) {
                     todosLosDatos = datos;
-                    // Guardar en caché para próximas visitas
                     localStorage.setItem('vsd_resultados_cache', JSON.stringify(datos));
-
-                    extraerColumnasYCategorias(todosLosDatos);
-                    renderizarTabla(todosLosDatos);
-
-                    document.getElementById('estado').classList.add('oculto');
-                    document.getElementById('tablaWrapper').classList.remove('oculto');
-                } else if (todosLosDatos.length === 0) {
-                    document.getElementById('estado').innerHTML = "<p>No hay resultados registrados aún.</p>";
+                    renderizarTabla();
                 }
+                document.getElementById('estado').classList.add('oculto');
+
             } catch (error) {
-                console.warn('Conexión lenta o sin internet, utilizando datos en caché si existen.', error);
-                if (todosLosDatos.length === 0) {
-                    document.getElementById('estado').innerHTML = "<p>Error al cargar los datos. Por favor, reintenta más tarde.</p>";
-                }
+                console.warn('Conexión lenta o fallo al obtener datos desde Apps Script. Usando datos en caché si existen.', error);
+                document.getElementById('estado').classList.add('oculto');
             }
         }
 
-        // -------------------------------------------------------------
-        // 2. Extraer Nombres de Columnas y Poblar Selector de Categorías
-        // -------------------------------------------------------------
-        function extraerColumnasYCategorias(datos) {
-            nombresColumnas = Object.keys(datos[0]);
-
-            // Detectar columna de categoría si existe
-            const colCategoria = nombresColumnas.find(key => key.toLowerCase().includes('categor'));
+        function filtrarPorDia(dia) {
+            diaSeleccionado = normalizarTexto(dia);
             
-            if (colCategoria) {
-                const categoriasUnicas = [...new Set(datos.map(item => item[colCategoria]))].filter(Boolean);
-                const selectCat = document.getElementById('filtroCategoria');
-                
-                // Limpiar opciones previas excepto la primera
-                selectCat.innerHTML = '<option value="">Todas las categorías</option>';
-
-                categoriasUnicas.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat;
-                    option.textContent = cat;
-                    selectCat.appendChild(option);
-                });
-            }
+            document.querySelectorAll('.btn-dia').forEach(btn => {
+                const btnTextoNorm = normalizarTexto(btn.textContent);
+                if (btnTextoNorm.includes(diaSeleccionado) || (diaSeleccionado === 'SABADO' && btnTextoNorm.includes('SABADO'))) {
+                    btn.classList.add('activo');
+                } else {
+                    btn.classList.remove('activo');
+                }
+            });
+            renderizarTabla();
         }
 
-        // -------------------------------------------------------------
-        // 3. Renderizar Tabla Dinámicamente
-        // -------------------------------------------------------------
-        function renderizarTabla(datos) {
-            const headersTabla = document.getElementById('headersTabla');
-            const cuerpoTabla = document.getElementById('cuerpoTabla');
+        function filtrarPorCategoria(cat) {
+            categoriaSeleccionada = cat;
+            renderizarTabla();
+        }
 
-            headersTabla.innerHTML = '';
-            cuerpoTabla.innerHTML = '';
+        function parsearFechaLatino(fechaStr) {
+            if (!fechaStr) return null;
+            const str = String(fechaStr).trim();
 
-            if (datos.length === 0) {
-                document.getElementById('tablaWrapper').classList.add('oculto');
-                document.getElementById('sinResultados').classList.remove('oculto');
+            const coincidenciaFormato = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+            if (coincidenciaFormato) {
+                const dia = parseInt(coincidenciaFormato[1], 10);
+                const mes = parseInt(coincidenciaFormato[2], 10) - 1; 
+                let anio = parseInt(coincidenciaFormato[3], 10);
+                if (anio < 100) anio += 2000;
+                const fechaLocal = new Date(anio, mes, dia);
+                if (!isNaN(fechaLocal.getTime())) return fechaLocal;
+            }
+            return null;
+        }
+
+        function renderizarTabla() {
+            const headersRow = document.getElementById('headers');
+            const cuerpoTabla = document.getElementById('cuerpo-tabla');
+
+            if (!headersRow || !cuerpoTabla || todosLosDatos.length === 0) return;
+
+            const keys = Object.keys(todosLosDatos[0]);
+            const keyMarcaTemporal = keys.find(k => normalizarTexto(k).includes("MARCA") || normalizarTexto(k).includes("TEMPORAL")) || keys[0];
+            const keyCategoria = keys.find(k => normalizarTexto(k).includes("CATEGORIA"));
+
+            // Excluir columnas temporales o de control si existen
+            const encabezadosVisibles = keys.filter(k => {
+                const norm = normalizarTexto(k);
+                return k !== keyMarcaTemporal && !norm.includes("MARCA") && !norm.includes("RESULTADO FINAL");
+            });
+
+            headersRow.innerHTML = encabezadosVisibles.map(h => `<th>${h}</th>`).join('');
+
+            const diaBusqueda = normalizarTexto(diaSeleccionado);
+            const catBusqueda = normalizarTexto(categoriaSeleccionada);
+
+            const datosFiltrados = todosLosDatos.filter(fila => {
+                if (catBusqueda !== 'TODAS' && keyCategoria) {
+                    if (!normalizarTexto(fila[keyCategoria]).includes(catBusqueda)) return false;
+                }
+                
+                if (diaBusqueda === 'TODOS') return true;
+
+                const valorMarca = fila[keyMarcaTemporal];
+                if (!valorMarca) return false;
+
+                const txtNorm = normalizarTexto(valorMarca);
+                if (diaBusqueda === "VIERNES" && (txtNorm.includes("VIERNES") || txtNorm.includes("VIE"))) return true;
+                if (diaBusqueda === "SABADO" && (txtNorm.includes("SABADO") || txtNorm.includes("SAB"))) return true;
+                if (diaBusqueda === "DOMINGO" && (txtNorm.includes("DOMINGO") || txtNorm.includes("DOM"))) return true;
+
+                const fecha = parsearFechaLatino(valorMarca);
+                if (fecha) {
+                    const numDia = fecha.getDay(); 
+                    if (diaBusqueda === 'VIERNES' && numDia === 5) return true;
+                    if (diaBusqueda === 'SABADO' && numDia === 6) return true;
+                    if (diaBusqueda === 'DOMINGO' && numDia === 0) return true;
+                }
+
+                return false;
+            });
+
+            if (datosFiltrados.length === 0) {
+                cuerpoTabla.innerHTML = `<tr><td colspan="${encabezadosVisibles.length}">No hay partidos cargados para este filtro.</td></tr>`;
                 return;
             }
 
-            document.getElementById('tablaWrapper').classList.remove('oculto');
-            document.getElementById('sinResultados').classList.add('oculto');
+            let HTMLFilas = '';
 
-            // Render Encabezados
-            nombresColumnas.forEach(col => {
-                const th = document.createElement('th');
-                th.textContent = col;
-                headersTabla.appendChild(th);
-            });
+            datosFiltrados.forEach(fila => {
+                const analisisGanador = obtenerGanadorPorSets(fila, encabezadosVisibles);
+                let celdasHTML = '';
 
-            // Render Filas
-            datos.forEach(fila => {
-                const tr = document.createElement('tr');
+                encabezadosVisibles.forEach(header => {
+                    let valor = (fila[header] !== undefined && fila[header] !== null && fila[header] !== "") ? fila[header] : "-";
+                    const headerUpper = normalizarTexto(header);
+                    const esSets = headerUpper.includes('SET') || headerUpper.includes('PUNTOS') || headerUpper.includes('SCORE');
 
-                nombresColumnas.forEach(col => {
-                    const td = document.createElement('td');
-                    td.textContent = fila[col] || '-';
+                    let contenidoTd = valor;
 
-                    // Resaltar Ganadores si la columna contiene palabras clave
-                    if (col.toLowerCase().includes('ganador') || col.toLowerCase().includes('vencedor')) {
-                        td.classList.add('ganador-cell');
+                    if (analisisGanador.ganadorHeader && analisisGanador.ganadorHeader === header && valor !== "-") {
+                        contenidoTd = `<span class="equipo-ganador">🏆 ${valor}</span>`;
+                    } 
+                    else if (analisisGanador.setsGanadorHeader && header === analisisGanador.setsGanadorHeader && valor !== "-") {
+                        contenidoTd = `<span class="badge-puntos puntos-ganadores">${valor}</span>`;
+                    } 
+                    else if (esSets && valor !== "-") {
+                        contenidoTd = `<span class="badge-puntos">${valor}</span>`;
                     }
 
-                    tr.appendChild(td);
+                    celdasHTML += `<td data-label="${header}">${contenidoTd}</td>`;
                 });
 
-                cuerpoTabla.appendChild(tr);
-            });
-        }
-
-        // -------------------------------------------------------------
-        // 4. Filtrado en Tiempo Real
-        // -------------------------------------------------------------
-        function aplicarFiltros() {
-            const textoBusqueda = document.getElementById('buscarJugador').value.toLowerCase().trim();
-            const categoriaSel = document.getElementById('filtroCategoria').value;
-            const fechaSel = document.getElementById('filtroFecha').value;
-
-            const datosFiltrados = todosLosDatos.filter(fila => {
-                // Filtro por Jugador (Busca en cualquier propiedad/columna)
-                const coincideTexto = textoBusqueda === '' || Object.values(fila).some(val => 
-                    String(val).toLowerCase().includes(textoBusqueda)
-                );
-
-                // Filtro por Categoría
-                const colCategoria = nombresColumnas.find(key => key.toLowerCase().includes('categor'));
-                const coincideCat = !categoriaSel || (colCategoria && fila[colCategoria] === categoriaSel);
-
-                // Filtro por Fecha
-                const colFecha = nombresColumnas.find(key => key.toLowerCase().includes('fecha'));
-                let coincideFecha = true;
-                if (fechaSel && colFecha && fila[colFecha]) {
-                    // Normalización simple para comparar la fecha seleccionada con el texto
-                    coincideFecha = fila[colFecha].includes(fechaSel) || 
-                                   formatearFechaParaComparacion(fila[colFecha]) === fechaSel;
-                }
-
-                return coincideTexto && coincideCat && coincideFecha;
+                HTMLFilas += `<tr>${celdasHTML}</tr>`;
             });
 
-            renderizarTabla(datosFiltrados);
+            cuerpoTabla.innerHTML = HTMLFilas;
         }
 
-        function formatearFechaParaComparacion(fechaStr) {
-            // Convierte DD/MM/YYYY a YYYY-MM-DD para igualar la entrada del input date
-            const partes = fechaStr.split(' ')[0].split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
-            }
-            return fechaStr;
-        }
+        function obtenerGanadorPorSets(fila, encabezados) {
+            let eq1Header = null, sets1 = 0, sets1Header = null;
+            let eq2Header = null, sets2 = 0, sets2Header = null;
 
-        // -------------------------------------------------------------
-        // 5. Gestión del Tema (Claro / Oscuro)
-        // -------------------------------------------------------------
-        function inicializarTema() {
-            const themeBtn = document.getElementById('themeToggleBtn');
-            const themeIcon = document.getElementById('themeIcon');
-            const themeText = document.getElementById('themeText');
-
-            // Detectar preferencia guardada o del sistema
-            const temaGuardado = localStorage.getItem('vsd_theme');
-            const prefiereOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (temaGuardado === 'dark' || (!temaGuardado && prefiereOscuro)) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Modo Claro';
-            }
-
-            themeBtn.addEventListener('click', () => {
-                const esOscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+            encabezados.forEach(h => {
+                const name = normalizarTexto(h);
                 
-                if (esOscuro) {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('vsd_theme', 'light');
-                    themeIcon.textContent = '🌙';
-                    themeText.textContent = 'Modo Oscuro';
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('vsd_theme', 'dark');
-                    themeIcon.textContent = '☀️';
-                    themeText.textContent = 'Modo Claro';
+                if (name.includes('EQUIPO 1') || name.includes('CLUB 1') || name.includes('LOCAL') || name.includes('JUGADOR 1')) {
+                    if (name.includes('SETS GANADOS') || name.includes('SETS') || name.includes('TOTAL SETS')) {
+                        sets1 = parseInt(fila[h], 10);
+                        sets1Header = h;
+                    } else if (!name.includes('SET')) {
+                        eq1Header = h;
+                    }
+                } else if (name.includes('EQUIPO 2') || name.includes('CLUB 2') || name.includes('VISITANTE') || name.includes('JUGADOR 2')) {
+                    if (name.includes('SETS GANADOS') || name.includes('SETS') || name.includes('TOTAL SETS')) {
+                        sets2 = parseInt(fila[h], 10);
+                        sets2Header = h;
+                    } else if (!name.includes('SET')) {
+                        eq2Header = h;
+                    }
                 }
             });
+
+            if (isNaN(sets1) || isNaN(sets2) || (sets1 === 0 && sets2 === 0)) {
+                sets1 = 0;
+                sets2 = 0;
+                
+                encabezados.forEach(h => {
+                    const name = normalizarTexto(h);
+                    if (name.includes('SET') && !name.includes('GANADOS')) {
+                        const val = fila[h];
+                        if (val && val.includes('-')) {
+                            const partes = val.split('-');
+                            const pts1 = parseInt(partes[0], 10);
+                            const pts2 = parseInt(partes[1], 10);
+                            if (!isNaN(pts1) && !isNaN(pts2)) {
+                                if (pts1 > pts2) sets1++;
+                                else if (pts2 > pts1) sets2++;
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (!isNaN(sets1) && !isNaN(sets2)) {
+                if (sets1 > sets2) {
+                    return { ganadorHeader: eq1Header, setsGanadorHeader: sets1Header };
+                } else if (sets2 > sets1) {
+                    return { ganadorHeader: eq2Header, setsGanadorHeader: sets2Header };
+                }
+            }
+
+            return { ganadorHeader: null, setsGanadorHeader: null };
         }
+
+        cargarDatos();
+        setInterval(cargarDatos, TIEMPO_REFRESCO_MS);
     </script>
 </body>
 </html>
