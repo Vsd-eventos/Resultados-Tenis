@@ -10,11 +10,23 @@
  
     <style>
         :root {
+            /* Paleta Principal */
             --color-negro: #121212;
             --color-rojo: #e31d2b;
             --color-blanco: #ffffff;
             --color-fondo: #152241;
             --color-gris-linea: #e2e8f0;
+            --color-error: #ff6b6b;
+            
+            /* Colores de Tarjetas / Estados */
+            --color-bg-select: #1e1e1e;
+            --color-bg-jugador: #f8f9fa;
+            --color-masculino: #1971c2;
+            --color-femenino: #c2255c;
+            --color-ganador-bg: #e6f6ec;
+            --color-ganador-borde: #2b8a3e;
+            
+            /* Tipografías */
             --fuente-principal: 'Oswald', sans-serif;
             --fuente-secundaria: 'Roboto', sans-serif;
         }
@@ -52,7 +64,7 @@
         }
  
         .logo-cuadrado {
-            background-color: #de020a;
+            background-color: var(--color-rojo);
             color: var(--color-blanco);
             width: 58px;
             height: 58px;
@@ -96,7 +108,7 @@
         }
  
         .select-categoria {
-            background-color: #1e1e1e;
+            background-color: var(--color-bg-select);
             color: var(--color-blanco);
             border: 2px solid var(--color-rojo);
             font-family: var(--fuente-principal);
@@ -138,6 +150,7 @@
             border-radius: 25px;
             cursor: pointer;
             text-transform: uppercase;
+            transition: all 0.2s ease;
         }
  
         .btn-dia.activo {
@@ -155,7 +168,7 @@
         }
  
         .loading.error {
-            color: #ff6b6b;
+            color: var(--color-error);
         }
  
         /* --- FORMATO TARJETA --- */
@@ -175,15 +188,15 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            --acento: var(--color-rojo);
+            --acento: var(--color-rojo); /* Default */
         }
 
         .match-card.mujeres {
-            --acento: #c2255c;
+            --acento: var(--color-femenino);
         }
 
         .match-card.varones {
-            --acento: #1971c2;
+            --acento: var(--color-masculino);
         }
  
         .match-header {
@@ -221,7 +234,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
-            background-color: #f8f9fa;
+            background-color: var(--color-bg-jugador);
             padding: 8px 12px;
             border-radius: 6px;
         }
@@ -238,8 +251,8 @@
  
         /* Fila del ganador */
         .player-row.ganador {
-            background-color: #e6f6ec;
-            box-shadow: inset 0 0 0 2px #2b8a3e;
+            background-color: var(--color-ganador-bg);
+            box-shadow: inset 0 0 0 2px var(--color-ganador-borde);
         }
  
         .player-row.ganador .player-name {
@@ -249,7 +262,7 @@
         .ganador-tag {
             display: inline-block;
             margin-left: 8px;
-            background-color: #2b8a3e;
+            background-color: var(--color-ganador-borde);
             color: var(--color-blanco);
             font-family: var(--fuente-principal);
             font-weight: 600;
@@ -268,8 +281,8 @@
         }
  
         .set-box {
-            background-color: #e2e8f0;
-            color: #121212;
+            background-color: var(--color-gris-linea);
+            color: var(--color-negro);
             font-family: var(--fuente-principal);
             font-weight: 700;
             font-size: 1rem;
@@ -302,7 +315,7 @@
             <h1>Torneo de <span class="rojo">Tenis</span></h1>
         </div>
  
-        <select id="select-categoria" class="select-categoria" aria-label="Filtrar por categoría" onchange="filtrarPorCategoria(this.value)">
+        <select id="select-categoria" class="select-categoria" aria-label="Filtrar por categoría">
             <option value="TODAS">🏆 Todas las Categorías</option>
             <option value="SUB 10">Sub 10</option>
             <option value="SUB 12">Sub 12</option>
@@ -312,253 +325,255 @@
         </select>
     </header>
  
-    <div class="main-container">
+    <main class="main-container">
         <div class="filtros-dias">
-            <button class="btn-dia" data-dia="VIERNES" onclick="filtrarPorDia('VIERNES')">Viernes</button>
-            <button class="btn-dia" data-dia="SABADO" onclick="filtrarPorDia('SABADO')">Sábado</button>
-            <button class="btn-dia" data-dia="DOMINGO" onclick="filtrarPorDia('DOMINGO')">Domingo</button>
-            <button class="btn-dia activo" data-dia="TODOS" onclick="filtrarPorDia('TODOS')">Todos los Días</button>
+            <button class="btn-dia" data-dia="VIERNES" aria-pressed="false">Viernes</button>
+            <button class="btn-dia" data-dia="SABADO" aria-pressed="false">Sábado</button>
+            <button class="btn-dia" data-dia="DOMINGO" aria-pressed="false">Domingo</button>
+            <button class="btn-dia activo" data-dia="TODOS" aria-pressed="true">Todos los Días</button>
         </div>
  
         <div id="matchesContainer" aria-live="polite">
             <p class="loading">Cargando partidos...</p>
         </div>
-    </div>
+    </main>
  
     <script>
-        const SPREADSHEET_ID = '1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U';
- 
-        const FILAS_ENCABEZADO = 1;
-        const INTERVALO_ACTUALIZACION = 15000;
-        const TOTAL_COLUMNAS = 10;
-        const SETS_PARA_GANAR = 2;
-        const DIAS_SEMANA = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
- 
-        let filas = [];
-        let firmaDatos = '';
-        let cargando = false;
-        let diaSeleccionado = 'TODOS';
-        let categoriaSeleccionada = 'TODAS';
- 
-        /* ---------- Utilidades ---------- */
- 
-        function normalizar(texto) {
-            return String(texto ?? '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .toUpperCase()
-                .trim();
-        }
- 
-        function escapeHTML(valor) {
-            return String(valor ?? '').replace(/[&<>"']/g, c => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[c]));
-        }
- 
-        /* ---------- Carga de datos ---------- */
- 
-        async function cargarDatos() {
-            if (cargando) return;
-            cargando = true;
- 
-            try {
-                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=${FILAS_ENCABEZADO}&_=${Date.now()}`;
-                const response = await fetch(url, { cache: 'no-store' });
-                if (!response.ok) throw new Error('Error al acceder a la planilla');
- 
-                const text = await response.text();
-                const inicio = text.indexOf('{');
-                const fin = text.lastIndexOf('}');
-                if (inicio === -1 || fin === -1) throw new Error('Formato de datos no válido');
- 
-                const json = JSON.parse(text.substring(inicio, fin + 1));
-                if (json.status === 'error') throw new Error('Google devolvió un error');
-                if (!json.table || !Array.isArray(json.table.rows)) throw new Error('Formato de datos no válido');
- 
-                const nuevasFilas = json.table.rows.map(row => {
-                    const c = row.c || [];
-                    const celdas = [];
-                    for (let i = 0; i < TOTAL_COLUMNAS; i++) {
-                        const cell = c[i];
-                        celdas.push(!cell ? '' : (cell.f ?? cell.v ?? ''));
+        // IIFE para evitar contaminar el scope global
+        (() => {
+            const SPREADSHEET_ID = '1LuhpcnRmOmDmU3VfTRtucPEdG0Y0lpe35_Tp2YL3q-U';
+            const FILAS_ENCABEZADO = 1;
+            const INTERVALO_ACTUALIZACION = 15000;
+            const TOTAL_COLUMNAS = 10;
+            const SETS_PARA_GANAR = 2;
+            const DIAS_SEMANA = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+     
+            let filas = [];
+            let firmaDatos = '';
+            let cargando = false;
+            let diaSeleccionado = 'TODOS';
+            let categoriaSeleccionada = 'TODAS';
+     
+            /* ---------- Utilidades ---------- */
+            function normalizar(texto) {
+                return String(texto ?? '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toUpperCase()
+                    .trim();
+            }
+     
+            function escapeHTML(valor) {
+                return String(valor ?? '').replace(/[&<>"']/g, c => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[c]));
+            }
+     
+            /* ---------- Carga de datos ---------- */
+            async function cargarDatos() {
+                if (cargando) return;
+                cargando = true;
+     
+                try {
+                    const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=${FILAS_ENCABEZADO}&_=${Date.now()}`;
+                    const response = await fetch(url, { cache: 'no-store' });
+                    if (!response.ok) throw new Error('Error al acceder a la planilla');
+     
+                    const text = await response.text();
+                    const inicio = text.indexOf('{');
+                    const fin = text.lastIndexOf('}');
+                    if (inicio === -1 || fin === -1) throw new Error('Formato de datos no válido');
+     
+                    const json = JSON.parse(text.substring(inicio, fin + 1));
+                    if (json.status === 'error') throw new Error('Google devolvió un error');
+                    if (!json.table || !Array.isArray(json.table.rows)) throw new Error('Formato de datos no válido');
+     
+                    const nuevasFilas = json.table.rows.map(row => {
+                        const c = row.c || [];
+                        const celdas = [];
+                        for (let i = 0; i < TOTAL_COLUMNAS; i++) {
+                            const cell = c[i];
+                            celdas.push(!cell ? '' : (cell.f ?? cell.v ?? ''));
+                        }
+                        const fechaRaw = c[0] ? (c[0].v ?? c[0].f ?? '') : '';
+                        return { celdas, fechaRaw };
+                    });
+     
+                    const firma = JSON.stringify(nuevasFilas);
+                    if (firma === firmaDatos) return; // Si los datos no cambiaron, no actualiza el DOM
+     
+                    firmaDatos = firma;
+                    filas = nuevasFilas;
+                    actualizarListaPartidos();
+                } catch (error) {
+                    console.error('Error al cargar datos:', error);
+                    if (filas.length === 0) {
+                        document.getElementById('matchesContainer').innerHTML = `
+                            <p class="loading error">
+                                No se pudieron cargar los partidos.<br>
+                                1. Revisá que el SPREADSHEET_ID sea el correcto.<br>
+                                2. Comprobá que la planilla esté compartida como "Cualquier persona con el enlace".
+                            </p>`;
                     }
-                    const fechaRaw = c[0] ? (c[0].v ?? c[0].f ?? '') : '';
-                    return { celdas, fechaRaw };
-                });
- 
-                const firma = JSON.stringify(nuevasFilas);
-                if (firma === firmaDatos) return;
- 
-                firmaDatos = firma;
-                filas = nuevasFilas;
-                actualizarListaPartidos();
-            } catch (error) {
-                console.error('Error al cargar datos:', error);
-                if (filas.length === 0) {
-                    document.getElementById('matchesContainer').innerHTML = `
-                        <p class="loading error">
-                            No se pudieron cargar los partidos.<br>
-                            1. Revisá que el SPREADSHEET_ID sea el correcto.<br>
-                            2. Comprobá que la planilla esté compartida como "Cualquier persona con el enlace".
-                        </p>`;
+                } finally {
+                    cargando = false;
                 }
-            } finally {
-                cargando = false;
             }
-        }
- 
-        /* ---------- Día de la semana ---------- */
- 
-        function obtenerDia(fila) {
-            const texto = normalizar(fila.celdas[0]);
- 
-            for (const dia of ['VIERNES', 'SABADO', 'DOMINGO']) {
-                if (texto.includes(dia)) return dia;
+     
+            /* ---------- Lógica de Procesamiento ---------- */
+            function obtenerDia(fila) {
+                const texto = normalizar(fila.celdas[0]);
+                for (const dia of ['VIERNES', 'SABADO', 'DOMINGO']) {
+                    if (texto.includes(dia)) return dia;
+                }
+     
+                let anio, mes, dia, r;
+                if ((r = String(fila.fechaRaw).match(/Date\((\d+),\s*(\d+),\s*(\d+)/))) {
+                    anio = +r[1]; mes = +r[2]; dia = +r[3];
+                } else if ((r = texto.match(/(\d{4})-(\d{2})-(\d{2})/))) {
+                    anio = +r[1]; mes = +r[2] - 1; dia = +r[3];
+                } else if ((r = texto.match(/(?:^|\D)(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4}|\d{2})(?!\d)/))) {
+                    dia = +r[1]; mes = +r[2] - 1; anio = +r[3];
+                    if (anio < 100) anio += 2000;
+                } else {
+                    return '';
+                }
+     
+                const fecha = new Date(anio, mes, dia);
+                return isNaN(fecha.getTime()) ? '' : DIAS_SEMANA[fecha.getDay()];
             }
- 
-            let anio, mes, dia;
-            let r;
- 
-            if ((r = String(fila.fechaRaw).match(/Date\((\d+),\s*(\d+),\s*(\d+)/))) {
-                anio = +r[1]; mes = +r[2]; dia = +r[3];
-            } else if ((r = texto.match(/(\d{4})-(\d{2})-(\d{2})/))) {
-                anio = +r[1]; mes = +r[2] - 1; dia = +r[3];
-            } else if ((r = texto.match(/(?:^|\D)(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4}|\d{2})(?!\d)/))) {
-                dia = +r[1]; mes = +r[2] - 1; anio = +r[3];
-                if (anio < 100) anio += 2000;
-            } else {
+     
+            function obtenerGenero(categoria) {
+                const t = normalizar(categoria);
+                if (/MUJER|FEM|DAMA|NENA|CHICA|GIRL|(?:^|[\s\-_\/])F(?:$|[\s\-_\/])/.test(t)) return 'mujeres';
+                if (/VARON|MASC|CABALLERO|NENE|CHICO|HOMBRE|BOY|(?:^|[\s\-_\/])M(?:$|[\s\-_\/])/.test(t)) return 'varones';
                 return '';
             }
- 
-            const fecha = new Date(anio, mes, dia);
-            return isNaN(fecha.getTime()) ? '' : DIAS_SEMANA[fecha.getDay()];
-        }
- 
-        /* ---------- Género y Ganador ---------- */
-
-        function obtenerGenero(categoria) {
-            const t = normalizar(categoria);
-            if (/MUJER|FEM|DAMA|NENA|CHICA|GIRL|(?:^|[\s\-_\/])F(?:$|[\s\-_\/])/.test(t)) return 'mujeres';
-            if (/VARON|MASC|CABALLERO|NENE|CHICO|HOMBRE|BOY|(?:^|[\s\-_\/])M(?:$|[\s\-_\/])/.test(t)) return 'varones';
-            return '';
-        }
- 
-        function numeroSet(valor) {
-            const n = parseInt(String(valor ?? '').trim(), 10);
-            return Number.isNaN(n) ? null : n;
-        }
- 
-        function calcularGanador(celdas) {
-            let setsJ1 = 0;
-            let setsJ2 = 0;
- 
-            for (let i = 0; i < 3; i++) {
-                const p1 = numeroSet(celdas[4 + i]);
-                const p2 = numeroSet(celdas[7 + i]);
-                if (p1 === null || p2 === null || p1 === p2) continue;
-                if (p1 > p2) setsJ1++; else setsJ2++;
+     
+            function numeroSet(valor) {
+                const n = parseInt(String(valor ?? '').trim(), 10);
+                return Number.isNaN(n) ? null : n;
             }
- 
-            if (setsJ1 > setsJ2 && setsJ1 >= SETS_PARA_GANAR) return 1;
-            if (setsJ2 > setsJ1 && setsJ2 >= SETS_PARA_GANAR) return 2;
-            return 0;
-        }
- 
-        function casillero(valor) {
-            const vacio = valor === '' || valor === null || valor === undefined;
-            return `<span class="set-box">${escapeHTML(vacio ? '-' : valor)}</span>`;
-        }
- 
-        /* ---------- Dibujo de Tarjetas ---------- */
-
-        function actualizarListaPartidos() {
-            const container = document.getElementById('matchesContainer');
- 
-            const filtrados = filas.filter(fila => {
-                const [, categoria, j1, j2] = fila.celdas;
- 
-                if (!String(j1).trim() && !String(j2).trim()) return false;
- 
-                if (diaSeleccionado !== 'TODOS' && obtenerDia(fila) !== diaSeleccionado) return false;
- 
-                if (categoriaSeleccionada !== 'TODAS') {
-                    const catNorm = normalizar(categoria);
-                    const selNorm = normalizar(categoriaSeleccionada);
-                    if (!catNorm.includes(selNorm)) return false;
+     
+            function calcularGanador(celdas) {
+                let setsJ1 = 0;
+                let setsJ2 = 0;
+     
+                for (let i = 0; i < 3; i++) {
+                    const p1 = numeroSet(celdas[4 + i]);
+                    const p2 = numeroSet(celdas[7 + i]);
+                    if (p1 === null || p2 === null || p1 === p2) continue;
+                    if (p1 > p2) setsJ1++; else setsJ2++;
                 }
- 
-                return true;
-            });
- 
-            if (filtrados.length === 0) {
-                container.innerHTML = '<p class="loading">No hay partidos registrados para esta selección.</p>';
-                return;
+     
+                if (setsJ1 > setsJ2 && setsJ1 >= SETS_PARA_GANAR) return 1;
+                if (setsJ2 > setsJ1 && setsJ2 >= SETS_PARA_GANAR) return 2;
+                return 0;
             }
- 
-            container.innerHTML = '';
- 
-            filtrados.forEach(({ celdas }) => {
-                const categoria = celdas[1] || 'Categoría';
-                const j1 = celdas[2] || 'Por definir';
-                const j2 = celdas[3] || 'Por definir';
- 
-                const genero = obtenerGenero(categoria);
-                const ganador = calcularGanador(celdas);
-
-                let etiquetaGenero = '';
-                if (genero === 'mujeres') etiquetaGenero = '<span class="genero-tag">Femenino</span>';
-                if (genero === 'varones') etiquetaGenero = '<span class="genero-tag">Masculino</span>';
-
-                const card = document.createElement('div');
-                card.className = `match-card ${genero}`;
-                card.innerHTML = `
-                    <div class="match-header">
-                        <span class="category-badge">${escapeHTML(categoria)}</span>
-                        ${etiquetaGenero}
-                    </div>
- 
-                    <div class="player-row ${ganador === 1 ? 'ganador' : ''}">
-                        <span class="player-name">
-                            ${escapeHTML(j1)}
-                            ${ganador === 1 ? '<span class="ganador-tag">Ganador</span>' : ''}
-                        </span>
-                        <div class="sets-container">
-                            ${casillero(celdas[4])}${casillero(celdas[5])}${casillero(celdas[6])}
+     
+            function casillero(valor) {
+                const vacio = valor === '' || valor === null || valor === undefined;
+                return `<span class="set-box">${escapeHTML(vacio ? '-' : valor)}</span>`;
+            }
+     
+            /* ---------- Dibujo de Tarjetas ---------- */
+            function actualizarListaPartidos() {
+                const container = document.getElementById('matchesContainer');
+                const fragment = document.createDocumentFragment(); // Mejor performance (evita múltiples reflows)
+     
+                const filtrados = filas.filter(fila => {
+                    const [, categoria, j1, j2] = fila.celdas;
+                    if (!String(j1).trim() && !String(j2).trim()) return false;
+                    if (diaSeleccionado !== 'TODOS' && obtenerDia(fila) !== diaSeleccionado) return false;
+                    
+                    if (categoriaSeleccionada !== 'TODAS') {
+                        const catNorm = normalizar(categoria);
+                        const selNorm = normalizar(categoriaSeleccionada);
+                        if (!catNorm.includes(selNorm)) return false;
+                    }
+                    return true;
+                });
+     
+                if (filtrados.length === 0) {
+                    container.innerHTML = '<p class="loading">No hay partidos registrados para esta selección.</p>';
+                    return;
+                }
+     
+                container.innerHTML = '';
+     
+                filtrados.forEach(({ celdas }) => {
+                    const categoria = celdas[1] || 'Categoría';
+                    const j1 = celdas[2] || 'Por definir';
+                    const j2 = celdas[3] || 'Por definir';
+     
+                    const genero = obtenerGenero(categoria);
+                    const ganador = calcularGanador(celdas);
+     
+                    let etiquetaGenero = '';
+                    if (genero === 'mujeres') etiquetaGenero = '<span class="genero-tag">Femenino</span>';
+                    if (genero === 'varones') etiquetaGenero = '<span class="genero-tag">Masculino</span>';
+     
+                    const card = document.createElement('div');
+                    card.className = `match-card ${genero}`;
+                    card.innerHTML = `
+                        <div class="match-header">
+                            <span class="category-badge">${escapeHTML(categoria)}</span>
+                            ${etiquetaGenero}
                         </div>
-                    </div>
- 
-                    <div class="player-row ${ganador === 2 ? 'ganador' : ''}">
-                        <span class="player-name">
-                            ${escapeHTML(j2)}
-                            ${ganador === 2 ? '<span class="ganador-tag">Ganador</span>' : ''}
-                        </span>
-                        <div class="sets-container">
-                            ${casillero(celdas[7])}${casillero(celdas[8])}${casillero(celdas[9])}
+                        <div class="player-row ${ganador === 1 ? 'ganador' : ''}">
+                            <span class="player-name">
+                                ${escapeHTML(j1)}
+                                ${ganador === 1 ? '<span class="ganador-tag">Ganador</span>' : ''}
+                            </span>
+                            <div class="sets-container">
+                                ${casillero(celdas[4])}${casillero(celdas[5])}${casillero(celdas[6])}
+                            </div>
                         </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
- 
-        /* ---------- Filtros ---------- */
- 
-        function filtrarPorDia(dia) {
-            diaSeleccionado = dia;
-            document.querySelectorAll('.btn-dia').forEach(btn => {
-                btn.classList.toggle('activo', btn.dataset.dia === dia);
-            });
-            actualizarListaPartidos();
-        }
- 
-        function filtrarPorCategoria(cat) {
-            categoriaSeleccionada = cat;
-            actualizarListaPartidos();
-        }
- 
-        cargarDatos();
-        setInterval(cargarDatos, INTERVALO_ACTUALIZACION);
+                        <div class="player-row ${ganador === 2 ? 'ganador' : ''}">
+                            <span class="player-name">
+                                ${escapeHTML(j2)}
+                                ${ganador === 2 ? '<span class="ganador-tag">Ganador</span>' : ''}
+                            </span>
+                            <div class="sets-container">
+                                ${casillero(celdas[7])}${casillero(celdas[8])}${casillero(celdas[9])}
+                            </div>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                });
+                
+                container.appendChild(fragment);
+            }
+     
+            /* ---------- Configuración de Eventos ---------- */
+            function inicializarEventos() {
+                // Filtros de categoría
+                document.getElementById('select-categoria').addEventListener('change', (e) => {
+                    categoriaSeleccionada = e.target.value;
+                    actualizarListaPartidos();
+                });
+
+                // Filtros de día
+                document.querySelectorAll('.btn-dia').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        diaSeleccionado = e.target.dataset.dia;
+                        
+                        document.querySelectorAll('.btn-dia').forEach(b => {
+                            const isSelected = b.dataset.dia === diaSeleccionado;
+                            b.classList.toggle('activo', isSelected);
+                            b.setAttribute('aria-pressed', isSelected.toString());
+                        });
+                        
+                        actualizarListaPartidos();
+                    });
+                });
+            }
+
+            // Iniciar aplicación
+            inicializarEventos();
+            cargarDatos();
+            setInterval(cargarDatos, INTERVALO_ACTUALIZACION);
+        })();
     </script>
 </body>
 </html>
